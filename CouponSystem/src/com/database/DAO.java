@@ -2,31 +2,34 @@ package com.database;
 
 import java.util.Collection;
 
-public interface DbInteractor {
-	void createCoupon(Coupon coupon);
+public interface DAO <T>{
+	boolean exists(String email, String password);
+	
+	void create(T t);
 
-	Coupon readCoupon(Coupon coupon);
+	T read(int id);
 
-	void updateCoupon(Coupon coupon);
+	void update(T t);
 
-	void deleteCoupon(Coupon coupon);
+	void delete(int id);
 
-	void createCompany(Company company);
+	Collection<T> readAll();
+//	void createCompany(Company company);
+//
+//	Company readCompany(Coupon coupon);
+//
+//	void updateCompany(Company company);
+//
+//	void deleteCompany(Company company);
+//
+//	void createCustomer(Customer customer);
+//
+//	Customer readCustomer(Customer customer);
+//
+//	void updateCustomer(Customer customer);
+//
+//	void deleteCustomer(Customer customer);
 
-	Company readCompany(Coupon coupon);
 
-	void updateCompany(Company company);
-
-	void deleteCompany(Company company);
-
-	void createCustomer(Customer customer);
-
-	Customer readCustomer(Customer customer);
-
-	void updateCustomer(Customer customer);
-
-	void deleteCustomer(Customer customer);
-
-	Collection<Coupon> readAll();
 
 }

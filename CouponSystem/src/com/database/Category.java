@@ -1,7 +1,9 @@
+//Ok
+
 package com.database;
 
-public enum CouponType {
-RESTURANS,
+public enum Category {
+RESTURANT,
 ELECTRICITY,
 FOOD,
 HEALTH,

@@ -1,48 +1,74 @@
+//Ok
+
 package com.database;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Customer {
-	private long id;
-	private String custName, password;
-
+	private int id;
+	private String firstName,lastName, password,email;
 	private List<Coupon> coupons = new ArrayList<>();
+	
+	public String getFirstName() {
+		return firstName;
+	}
 
-	public Customer(long id, String custName, String password, List<Coupon> coupons) {
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+
+	public Customer(int id, String custName, String password, List<Coupon> coupons) {
 		super();
 		this.id = id;
-		this.custName = custName;
+		this.firstName = custName;
 		this.password = password;
+		this.coupons = coupons;
+	}
+
+	public Customer(int id, String firstName, String lastName, String password, String email, List<Coupon> coupons) {
+		super();
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.password = password;
+		this.email = email;
 		this.coupons = coupons;
 	}
 
 	public Customer() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	public Customer(long id) {
+	public Customer(int id) {
 		super();
 		this.id = id;
 	}
 
-	public long getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(int id) {
 		this.id = id;
 	}
-
-	public String getCustName() {
-		return custName;
-	}
-
-	public void setCustName(String custName) {
-		this.custName = custName;
-	}
-
 	public String getPassword() {
 		return password;
 	}
@@ -59,12 +85,13 @@ public class Customer {
 		this.coupons = coupons;
 	}
 
+	
 	@Override
 	public String toString() {
-		return "Customer [id=" + id + ", custName=" + custName + ", password=" + password + ", coupons=" + coupons
-				+ "]";
+		return "Customer [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", password=" + password
+				+ ", email=" + email + ", coupons=" + coupons + "]";
 	}
-	
+
 	public void addCoupon(Coupon coupon) {
 		coupons.add(coupon);
 	}

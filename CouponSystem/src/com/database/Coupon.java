@@ -1,12 +1,13 @@
+//Ok
 package com.database;
 
 import java.util.Date;
 
-public class Coupon implements SqlInteractor {
-	private long id;
+public class Coupon {
+	private int id,companyId;
 	private int amount;
-	private String title, message;
-	private CouponType couponType;
+	private String title, description;
+	private Category category;
 
 	private double price;
 	private Date startDate, endDate;
@@ -34,25 +35,19 @@ public class Coupon implements SqlInteractor {
 		return true;
 	}
 
+
 	@Override
 	public String toString() {
-		return "Coupon [id=" + id + ", amount=" + amount + ", title=" + title + ", message=" + message + ", couponType="
-				+ couponType + ", price=" + price + ", startDate=" + startDate + ", endDate=" + endDate + ", image="
-				+ image + "]";
-	}
-	
-	private java.sql.Date getSqlStartDate(){
-		return (java.sql.Date) this.startDate;
-	}
-	private java.sql.Date getSqlEndDate(){
-		return (java.sql.Date) this.endDate;
+		return "Coupon [id=" + id + ", companyId=" + companyId + ", amount=" + amount + ", title=" + title
+				+ ", description=" + description + ", category=" + category + ", price=" + price + ", startDate="
+				+ startDate + ", endDate=" + endDate + ", image=" + image + "]";
 	}
 
 	public long getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
@@ -64,6 +59,30 @@ public class Coupon implements SqlInteractor {
 		this.amount = amount;
 	}
 
+	public int getCompanyId() {
+		return companyId;
+	}
+
+	public void setCompanyId(int companyId) {
+		this.companyId = companyId;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public Category getCategory() {
+		return category;
+	}
+
+	public void setCategory(Category category) {
+		this.category = category;
+	}
+
 	public String getTitle() {
 		return title;
 	}
@@ -73,19 +92,19 @@ public class Coupon implements SqlInteractor {
 	}
 
 	public String getMessage() {
-		return message;
+		return description;
 	}
 
 	public void setMessage(String message) {
-		this.message = message;
+		this.description = message;
 	}
 
-	public CouponType getCouponType() {
-		return couponType;
+	public Category getCouponType() {
+		return category;
 	}
 
-	public void setCouponType(CouponType couponType) {
-		this.couponType = couponType;
+	public void setCouponType(Category couponType) {
+		this.category = couponType;
 	}
 
 	public double getPrice() {
@@ -122,50 +141,66 @@ public class Coupon implements SqlInteractor {
 
 	public Coupon() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	@Override
-	public String create() {
-		// ("insert into coupon "
-				// + "(id,title,start_date,end_date,amount,type,message,price,image) "
-				// + "values (?,?,?,?,?,?,?,?,?)");
-		
-		return "INSERT INTO coupon "
-				+ "(id,title,start_date,end_date,amount,type,message,price,image)"
-				+ "VALUES(" +id+ ",'"+ title + "'," + startDate + "," + endDate + ","
-				+amount + ",'" + couponType + "','" + message + "'," + price + ",'" 
-				+ image + "')" ;
+	public Coupon(int id, int amount, String title, String message, Category couponType, double price, Date startDate,
+			Date endDate, String image) {
+		super();
+		this.id = id;
+		this.amount = amount;
+		this.title = title;
+		this.description = message;
+		this.category = couponType;
+		this.price = price;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.image = image;
 	}
 
-	@Override
-	public String read() {
-		// TODO Auto-generated method stub
-		return "SELECT * FROM coupon WHERE id = " + id;
+	public Coupon(int id) {
+		super();
+		this.id = id;
 	}
+	
 
-	@Override
-	public String update() {
-		// TODO Auto-generated method stub
-//		("update coupon set "
-//		+ "title = ?, Start_date = ?, end_date = ?,"
-//		+ "amount = ? , type = ? , message = ?,"
-//		+ "price = ? ,image = ? where id = ?")
-		
-		return "update coupon set "
-				+ "title = ''" + title + ", Start_date =" + getSqlStartDate() 
-				+", end_date = " + getSqlEndDate() 
-				+ ",amount = "+ amount + " , type = '" 
-				+getCouponType() + "', message = '" + message +"',"
-				+ "price = " + price
-				+ " ,image = '" +image+"'"
-				+ " where id = " + id;
-	}
-
-	@Override
-	public String delete() {
-		// TODO Auto-generated method stub
-		return "DELETE FROM coupon WHERE id = " + id;
-	}
+//	@Override
+//	public String create() {
+//		// ("insert into coupon "
+//				// + "(id,title,start_date,end_date,amount,type,message,price,image) "
+//				// + "values (?,?,?,?,?,?,?,?,?)");
+//		
+//		return "INSERT INTO coupon "
+//				+ "(id,title,start_date,end_date,amount,type,message,price,image)"
+//				+ "VALUES(" +id+ ",'"+ title + "'," + startDate + "," + endDate + ","
+//				+amount + ",'" + couponType + "','" + message + "'," + price + ",'" 
+//				+ image + "')" ;
+//	}
+//
+//	@Override
+//	public String read() {
+//		return "SELECT * FROM coupon WHERE id = " + id;
+//	}
+//
+//	@Override
+//	public String update() {
+////		("update coupon set "
+////		+ "title = ?, Start_date = ?, end_date = ?,"
+////		+ "amount = ? , type = ? , message = ?,"
+////		+ "price = ? ,image = ? where id = ?")
+//		
+//		return "update coupon set "
+//				+ "title = ''" + title + ", Start_date =" + getSqlStartDate() 
+//				+", end_date = " + getSqlEndDate() 
+//				+ ",amount = "+ amount + " , type = '" 
+//				+getCouponType() + "', message = '" + message +"',"
+//				+ "price = " + price
+//				+ " ,image = '" +image+"'"
+//				+ " where id = " + id;
+//	}
+//
+//	@Override
+//	public String delete() {
+//		return "DELETE FROM coupon WHERE id = " + id;
+//	}
 
 }
