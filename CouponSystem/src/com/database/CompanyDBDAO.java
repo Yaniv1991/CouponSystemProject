@@ -77,7 +77,7 @@ public class CompanyDBDAO implements DAO<Company> {
 		result.setName(rs.getString("name"));
 		result.setPassword(rs.getString("password"));
 		result.setEmail(rs.getString("email"));
-		result.setCoupons((List<Coupon>) new CouponDAO().readAll());
+		result.setCoupons((List<Coupon>) new CouponDBDAO().readAll());
 		return result;
 	}
 

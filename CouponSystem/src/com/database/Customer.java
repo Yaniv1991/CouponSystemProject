@@ -1,5 +1,3 @@
-//Ok
-
 package com.database;
 
 import java.util.ArrayList;

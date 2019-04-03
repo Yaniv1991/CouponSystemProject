@@ -43,7 +43,7 @@ public class Coupon {
 				+ startDate + ", endDate=" + endDate + ", image=" + image + "]";
 	}
 
-	public long getId() {
+	public int getId() {
 		return id;
 	}
 
