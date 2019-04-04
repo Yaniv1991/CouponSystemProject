@@ -3,7 +3,6 @@
 package com.database.utils;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,7 +15,7 @@ static long sleepTime = 200;
 
 	static Runnable getConnections = new Runnable()  {
 		public synchronized void run() {
-			for (int i = 0; i < 20; i++) {
+			for (int i = 0; i < 50; i++) {
 				Connection connection= ConnectionPool.getInstance().getConnection();
 						connections.add(connection);
 				System.out.println(connection + "Connection number " + (i+1));
@@ -35,7 +34,6 @@ static long sleepTime = 200;
 		
 		public synchronized void run(){
 			for (int i = 0; i < connections.size(); ) {
-				try {
 					ConnectionPool.getInstance().restoreConnection(connections.get(0));
 					connections.remove(0);
 					System.out.println("Connection restored");
@@ -45,13 +43,11 @@ static long sleepTime = 200;
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
 				}
+				
 			}
 		}
-	}
+	
 		
 	;
 
