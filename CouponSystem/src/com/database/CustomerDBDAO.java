@@ -20,10 +20,14 @@ public class CustomerDBDAO implements DAO<Customer> {
 	private static String sqlDelete = "delete from customers where id = ?";
 
 	@Override
-	public boolean exists(String email, String password) {
+	public boolean exists(String...arguments) throws CouponSystemException {
 		boolean result = false;
 		connect();
-
+		String email = arguments[0];
+		String password = arguments[1];
+		if(email.isEmpty() || password.isEmpty()) {
+			throw new CouponSystemException("Password or Email were empty");
+		}
 		try (Statement stmt = connection.createStatement()) {
 			String sql = "select * from customers where email = '" + email + "'" + " and password = '" + password + "'";
 			ResultSet rs = stmt.executeQuery(sql);

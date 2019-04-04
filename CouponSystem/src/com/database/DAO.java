@@ -3,7 +3,7 @@ package com.database;
 import java.util.Collection;
 
 public interface DAO <T>{
-	boolean exists(String email, String password);
+	boolean exists(String...arguments) throws CouponSystemException;
 	
 	void create(T t);
 

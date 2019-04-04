@@ -15,10 +15,10 @@ public class CouponDBDAO implements DAO<Coupon> {
 	private static String sqlCreate = "insert into coupons "
 			+ "(id,title,start_date,end_date,amount,type,description,price,image) " + "values (?,?,?,?,?,?,?,?,?)";
 
+	private static String sqlRead = "select * from coupons where id = ?";
+
 	private static String sqlUpdate = "update coupons set " + "title = ?, Start_date = ?, end_date = ?,"
 			+ "amount = ? , category = ? , description = ?," + "price = ? ,image = ? where id = ?";
-
-	private static String sqlRead = "select * from coupons where id = ?";
 
 	private static String sqlDelete = "delete from coupons where id = ?";
 
@@ -30,7 +30,7 @@ public class CouponDBDAO implements DAO<Coupon> {
 		try (PreparedStatement create = connection.prepareStatement(sqlCreate)) {
 			java.sql.Date startDate = (Date) coupon.getStartDate();
 			java.sql.Date endDate = (Date) coupon.getEndDate();
-			create.setLong(1, coupon.getId());
+			create.setInt(1, coupon.getId());
 			create.setString(2, coupon.getTitle());
 			create.setDate(3, startDate);
 			create.setDate(4, endDate);
@@ -41,10 +41,10 @@ public class CouponDBDAO implements DAO<Coupon> {
 			create.setString(9, coupon.getImage());
 
 			create.execute();
-			disconnect();
 		} catch (Exception e) {
 			DbExceptionHandler.HandleException(e);
 		}
+		finally {disconnect();}
 	}
 
 	@Override
@@ -63,6 +63,7 @@ public class CouponDBDAO implements DAO<Coupon> {
 		} catch (SQLException e) {
 			DbExceptionHandler.HandleException(e);
 		}
+		finally {disconnect();}
 		return result;
 	}
 
@@ -110,11 +111,11 @@ public class CouponDBDAO implements DAO<Coupon> {
 			update.setString(8, coupon.getImage());
 			update.setInt(9, coupon.getId());
 			update.execute();
-			disconnect();
 		} catch (SQLException e) {
 			DbExceptionHandler.HandleException(e);
+		} finally {
+			disconnect();
 		}
-
 	}
 
 	@Override
@@ -123,9 +124,10 @@ public class CouponDBDAO implements DAO<Coupon> {
 		try (PreparedStatement delete = connection.prepareStatement(sqlDelete)) {
 			delete.setInt(1, id);
 			delete.execute();
-			disconnect();
 		} catch (SQLException e) {
 			DbExceptionHandler.HandleException(e);
+		} finally {
+			disconnect();
 		}
 	}
 
@@ -140,11 +142,11 @@ public class CouponDBDAO implements DAO<Coupon> {
 				result.add(readFromActiveConnection(rs.getInt("id"), rs));
 			}
 
-			disconnect();
 		} catch (SQLException e) {
 			DbExceptionHandler.HandleException(e);
+		} finally {
+			disconnect();
 		}
-
 		return result;
 	}
 
@@ -158,36 +160,48 @@ public class CouponDBDAO implements DAO<Coupon> {
 				result.add(readFromActiveConnection(rs.getInt("id"), rs));
 			}
 
-			disconnect();
 		} catch (SQLException e) {
 			DbExceptionHandler.HandleException(e);
+		} finally {
+			disconnect();
 		}
 
 		return result;
 	}
 
-	//FIXME Do an elegant override for dis shiet
+	// FIXME Do an elegant override for dis shiet
 	@Override
-	public boolean exists(String email, String password) {
+	public boolean exists(String... arguments) throws CouponSystemException {
+
 		boolean result = false;
+		int id;
+		if (arguments.length!=1) {
+			throw new CouponSystemException("invalid arguments. CouponDao Accepts only an id of type int");
+		}
+		try {
+			id = Integer.parseInt(arguments[0]);
+		}
+		catch(NumberFormatException e) {
+			throw new CouponSystemException("invalid arguments. CouponDao Accepts only an id of type int");
+		}
 		connect();
-		try(Statement read = connection.createStatement()){
-			String sql = "select * from coupons where email = '" + email + "', password = '" + password + "'";
-			ResultSet rs = read.executeQuery(sql);
+		try (PreparedStatement read = connection.prepareStatement(sqlRead)) {
+			read.setInt(1, id);
+			ResultSet rs = read.executeQuery();
 			result = rs.next();
 		} catch (SQLException e) {
 			DbExceptionHandler.HandleException(e);
+		} finally {
+			disconnect();
 		}
 		return result;
 	}
 
 	private synchronized void connect() {
-		if (connection == null) {
-			connection = ConnectionPool.getInstance().getConnection();
-		}
+		connection = ConnectionPool.getInstance().getConnection();
 	}
 
-	private synchronized void disconnect() throws SQLException {
+	private synchronized void disconnect() {
 		ConnectionPool.getInstance().restoreConnection(connection);
 		connection = null;
 	}

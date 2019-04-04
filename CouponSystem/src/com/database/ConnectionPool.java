@@ -22,7 +22,7 @@ public class ConnectionPool {
 		}
 
 		catch (SQLException e) {
-
+			DbExceptionHandler.HandleException(e);
 		}
 	}
 
@@ -40,7 +40,7 @@ public class ConnectionPool {
 		}
 	}
 
-	public synchronized void restoreConnection(Connection connection) throws SQLException {
+	public synchronized void restoreConnection(Connection connection) {
 		connections.add(connection);
 		notify();
 	}
