@@ -2,6 +2,9 @@ package com.database;
 
 public class CouponSystemException extends Exception{
 
+	//TODO create Exceptions that extend this one
+	//such as a CouponAlreadyExistsException and so on...
+	
 	/**
 	 * 
 	 */

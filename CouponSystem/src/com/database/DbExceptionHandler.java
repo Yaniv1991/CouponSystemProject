@@ -9,14 +9,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatterBuilder;
 import java.util.Date;
 
 public class DbExceptionHandler {
 private static String fileName = "D:\\DBExceptionLogger.txt";
-	
-	public static void HandleException(Exception e) {
+	//TODO throw non-connection related exceptions into a
+	// ProgramExceptionHandler for further logging
+
+public static void HandleException(Exception e) {
 		logToFile(e);
 		if(e instanceof CouponSystemException) {
 			//Do something
@@ -41,7 +41,7 @@ do {
 		e = (Exception)e.getCause();
 		}
 	while(e != null) ;
-
+sb.append("\n");
 		String trace = sb.toString();
 		Path file = Paths.get(fileName);
 		if(Files.notExists(file, LinkOption.NOFOLLOW_LINKS)) {
