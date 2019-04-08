@@ -36,7 +36,7 @@ public class ConnectionPool {
 				connection.close();
 			}
 		} catch (Exception e) {
-
+			DbExceptionHandler.HandleException(e);
 		}
 	}
 
