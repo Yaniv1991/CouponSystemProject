@@ -22,31 +22,29 @@ public class CompanyDBDAO implements DAO<Company> {
 	private Connection connection;
 
 	@Override
-	public boolean exists(String...arguments) throws CouponSystemException {
+	public boolean exists(String... arguments) throws CouponSystemException {
 		boolean result = false;
-			connect();
-			String email = arguments[0];
-			String password = arguments[1];
-			if(email.isEmpty() || password.isEmpty()) {
-				throw new CouponSystemException("Password or Email were empty");
-			}
+		connect();
+		String email = arguments[0];
+		String password = arguments[1];
+		if (email.isEmpty() || password.isEmpty()) {
+			throw new CouponSystemException("Password or Email were empty");
+		}
 
-			try (Statement stmt = connection.createStatement()) {
-				String sql = "select * from companies where email = '" + email + "'" + " and password = '" + password
-						+ "'";
-				ResultSet rs = stmt.executeQuery(sql);
-				result = rs.next();
-				disconnect();
-			} catch (SQLException e) {
-				DbExceptionHandler.HandleException(e);
-			}
-		
+		try (Statement stmt = connection.createStatement()) {
+			String sql = "select * from companies where email = '" + email + "'" + " and password = '" + password + "'";
+			ResultSet rs = stmt.executeQuery(sql);
+			result = rs.next();
+			disconnect();
+		} catch (SQLException e) {
+			DbExceptionHandler.HandleException(e);
+		}
+
 		return result;
 	}
 
-	
 	@Override
-	public void create(Company company) {
+	public void create(Company company) throws CouponSystemException {
 		// "insert into companies (name,email,password) values(?,?,?)"
 		connect();
 		try (PreparedStatement create = connection.prepareStatement(sqlCreate)) {
@@ -63,11 +61,11 @@ public class CompanyDBDAO implements DAO<Company> {
 	}
 
 	@Override
-	public Company read(int id) {
+	public Company read(int id) throws CouponSystemException {
 		Company result = null;
 		connect();
 		try {
-		result = readFromActiveConnection(id);
+			result = readFromActiveConnection(id);
 			disconnect();
 		} catch (SQLException e) {
 			DbExceptionHandler.HandleException(e);
@@ -75,25 +73,28 @@ public class CompanyDBDAO implements DAO<Company> {
 		return result;
 	}
 
-
 	private Company createCompany(int id, ResultSet rs) throws SQLException {
 		Company result;
 		result = new Company(id);
 		result.setName(rs.getString("name"));
 		result.setPassword(rs.getString("password"));
 		result.setEmail(rs.getString("email"));
-		result.setCoupons((List<Coupon>) new CouponDBDAO().readAll());
+		try {
+			result.setCoupons((List<Coupon>) new CouponDBDAO().readAll());
+		} catch (CouponSystemException e) {
+			DbExceptionHandler.HandleException(e);
+		}
 		return result;
 	}
 
 	@Override
-	public void update(Company company) {
+	public void update(Company company) throws CouponSystemException {
 //		"update companies set name = ?,password = ?,email = ? where id = ?"
 		connect();
 		try (PreparedStatement update = connection.prepareStatement(sqlUpdate)) {
 
 //			Company company = readFromActiveConnection(company.getId());
-		
+
 			update.setString(1, company.getName());
 			update.setString(2, company.getPassword());
 			update.setString(3, company.getEmail());
@@ -106,7 +107,7 @@ public class CompanyDBDAO implements DAO<Company> {
 	}
 
 	@Override
-	public void delete(int id) {
+	public void delete(int id) throws CouponSystemException {
 		connect();
 		try (PreparedStatement delete = connection.prepareStatement(sqlDelete)) {
 
@@ -120,7 +121,7 @@ public class CompanyDBDAO implements DAO<Company> {
 	}
 
 	@Override
-	public Collection<Company> readAll() {
+	public Collection<Company> readAll() throws CouponSystemException {
 		List<Company> result = new ArrayList<>();
 		connect();
 
@@ -138,9 +139,8 @@ public class CompanyDBDAO implements DAO<Company> {
 		return result;
 
 	}
-	
-	
-	private synchronized void connect() {
+
+	private synchronized void connect() throws CouponSystemException {
 		if (connection == null) {
 			connection = connectionPool.getConnection();
 		}
@@ -151,7 +151,6 @@ public class CompanyDBDAO implements DAO<Company> {
 		connection = null;
 	}
 
-	
 	private Company readFromActiveConnection(int id) {
 		Company result = null;
 		try (PreparedStatement read = connection.prepareStatement(sqlRead)) {
@@ -161,7 +160,7 @@ public class CompanyDBDAO implements DAO<Company> {
 			if (rs.next()) {
 				result = createCompany(id, rs);
 			}
-			
+
 		} catch (SQLException e) {
 			DbExceptionHandler.HandleException(e);
 		}

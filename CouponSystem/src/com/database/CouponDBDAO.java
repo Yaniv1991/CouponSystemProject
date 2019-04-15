@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class CouponDBDAO implements DAO<Coupon> {
-
+//TODO Change the sqlCreate Statement
 	private static String sqlCreate = "insert into coupons "
 			+ "(id,title,start_date,end_date,amount,type,description,price,image) " + "values (?,?,?,?,?,?,?,?,?)";
 
@@ -25,7 +25,7 @@ public class CouponDBDAO implements DAO<Coupon> {
 	private Connection connection;
 
 	@Override
-	public void create(Coupon coupon) {
+	public void create(Coupon coupon) throws CouponSystemException {
 		connect();
 		try (PreparedStatement create = connection.prepareStatement(sqlCreate)) {
 			java.sql.Date startDate = (Date) coupon.getStartDate();
@@ -48,7 +48,7 @@ public class CouponDBDAO implements DAO<Coupon> {
 	}
 
 	@Override
-	public Coupon read(int id) {
+	public Coupon read(int id) throws CouponSystemException {
 		// ("select * from ? where id = ?")
 		Coupon result = null;
 		connect();
@@ -92,7 +92,7 @@ public class CouponDBDAO implements DAO<Coupon> {
 	}
 
 	@Override
-	public void update(Coupon coupon) {
+	public void update(Coupon coupon) throws CouponSystemException {
 		/*
 		 * "update coupon set " + "title = ?, Start_date = ?, end_date = ?," +
 		 * "amount = ? , category = ? , description = ?," +
@@ -119,7 +119,7 @@ public class CouponDBDAO implements DAO<Coupon> {
 	}
 
 	@Override
-	public void delete(int id) {
+	public void delete(int id) throws CouponSystemException {
 		connect();
 		try (PreparedStatement delete = connection.prepareStatement(sqlDelete)) {
 			delete.setInt(1, id);
@@ -132,7 +132,7 @@ public class CouponDBDAO implements DAO<Coupon> {
 	}
 
 	@Override
-	public Collection<Coupon> readAll() {
+	public Collection<Coupon> readAll() throws CouponSystemException {
 		List<Coupon> result = new ArrayList<>();
 		connect();
 		try (Statement readAll = connection.createStatement()) {
@@ -150,7 +150,7 @@ public class CouponDBDAO implements DAO<Coupon> {
 		return result;
 	}
 
-	public Collection<Coupon> readAll(Company company) {
+	public Collection<Coupon> readAll(Company company) throws CouponSystemException {
 		List<Coupon> result = new ArrayList<>();
 		connect();
 		try (Statement readAll = connection.createStatement()) {
@@ -182,7 +182,7 @@ public class CouponDBDAO implements DAO<Coupon> {
 			id = Integer.parseInt(arguments[0]);
 		}
 		catch(NumberFormatException e) {
-			throw new CouponSystemException("invalid arguments. CouponDao Accepts only an id of type int");
+			throw new CouponSystemException("invalid arguments. CouponDao Accepts only an id of type int",e);
 		}
 		connect();
 		try (PreparedStatement read = connection.prepareStatement(sqlRead)) {
@@ -197,7 +197,7 @@ public class CouponDBDAO implements DAO<Coupon> {
 		return result;
 	}
 
-	private synchronized void connect() {
+	private synchronized void connect() throws CouponSystemException {
 		connection = ConnectionPool.getInstance().getConnection();
 	}
 

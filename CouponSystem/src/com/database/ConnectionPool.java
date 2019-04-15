@@ -12,6 +12,7 @@ public class ConnectionPool {
 	private static ConnectionPool instance = new ConnectionPool();
 	private Set<Connection> connections = new HashSet<>();
 	private String url = "jdbc:derby://localhost:1527/db1";
+	private boolean poolIsClosing = false;
 
 	private ConnectionPool() {
 		// add 10 connections to the set.
@@ -27,16 +28,25 @@ public class ConnectionPool {
 	}
 
 	public static ConnectionPool getInstance() {
+		if (instance == null) {
+			instance = new ConnectionPool();
+		}
 		return instance;
 	}
 
-	public void closeAllConnections() {
-		try {
-			for (Connection connection : connections) {
-				connection.close();
+	public synchronized void closeAllConnections() {
+		poolIsClosing = true;
+		int numberOfClosedConnections = 0;
+		while (numberOfClosedConnections < MAX_CONNECTIONS) {
+			try {
+				for (Connection connection : connections) {
+					connection.close();
+					numberOfClosedConnections++;
+				}
+				wait();
+			} catch (SQLException | InterruptedException e) {
+				DbExceptionHandler.HandleException(e);
 			}
-		} catch (Exception e) {
-			DbExceptionHandler.HandleException(e);
 		}
 	}
 
@@ -45,12 +55,16 @@ public class ConnectionPool {
 		notify();
 	}
 
-	public synchronized Connection getConnection() {
-		if (connections.size() == 0) {
+	public synchronized Connection getConnection() throws CouponSystemException {
+		if (poolIsClosing) {
+			throw new CouponSystemException("Pool is closing");
+		}
+		while (connections.isEmpty()) {
 			try {
 				wait();
 			} catch (InterruptedException e) {
 				DbExceptionHandler.HandleException(e);
+
 			}
 		}
 		Connection result = connections.iterator().next();

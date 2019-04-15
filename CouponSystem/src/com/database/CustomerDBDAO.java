@@ -41,7 +41,7 @@ public class CustomerDBDAO implements DAO<Customer> {
 	}
 
 	@Override
-	public void create(Customer customer) {
+	public void create(Customer customer) throws CouponSystemException {
 		// "insert into customers (first_name,last_name,password,email) VALUES(?,?,?,?)"
 		connect();
 		try (PreparedStatement create = connection.prepareStatement(sqlCreate)) {
@@ -58,16 +58,12 @@ public class CustomerDBDAO implements DAO<Customer> {
 	}
 
 	@Override
-	public Customer read(int id) {
+	public Customer read(int id) throws CouponSystemException {
 		// "select * from customers where id = ?"
 		Customer result = null;
 		connect();
-		try {
 			result = readFromConnection(id);
-			disconnect();
-		} catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
-		}
+			disconnect(); 
 		return result;
 	}
 
@@ -75,7 +71,7 @@ public class CustomerDBDAO implements DAO<Customer> {
 
 
 	@Override
-	public void update(Customer customer) {
+	public void update(Customer customer) throws CouponSystemException{
 		// "update customers set first_name = ?
 		// , last_name = ? , password = ? , email = ? WHERE id = ?"
 		connect();
@@ -95,7 +91,7 @@ public class CustomerDBDAO implements DAO<Customer> {
 	}
 
 	@Override
-	public void delete(int id) {
+	public void delete(int id) throws CouponSystemException{
 		connect();
 		try(PreparedStatement delete = connection.prepareStatement(sqlDelete)){
 			delete.setInt(1, id);
@@ -107,7 +103,7 @@ public class CustomerDBDAO implements DAO<Customer> {
 	}
 
 	@Override
-	public Collection<Customer> readAll() {
+	public Collection<Customer> readAll() throws CouponSystemException{
 		List<Customer> result = new ArrayList<>();
 		connect();
 		String sqlReadAll = "select * from customers";
@@ -124,13 +120,13 @@ public class CustomerDBDAO implements DAO<Customer> {
 		return result;
 	}
 
-	private synchronized void connect() {
+	private synchronized void connect() throws CouponSystemException {
 		if (connection == null) {
 			connection = ConnectionPool.getInstance().getConnection();
 		}
 	}
 
-	private synchronized void disconnect() throws SQLException {
+	private synchronized void disconnect() {
 		ConnectionPool.getInstance().restoreConnection(connection);
 		connection = null;
 	}

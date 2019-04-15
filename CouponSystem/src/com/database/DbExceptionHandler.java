@@ -1,60 +1,66 @@
 package com.database;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class DbExceptionHandler {
-private static String fileName = "D:\\DBExceptionLogger.txt";
-	//TODO throw non-connection related exceptions into a
+	private static String fileName = "DBExceptionLogger";
+	private static String filePath = "D:\\Exceptions\\";
+	private static String fileExtension = ".txt";
+
+	// TODO throw non-connection related exceptions into a
 	// ProgramExceptionHandler for further logging
 
-public static void HandleException(Exception e) {
+	public static void HandleException(Exception e) {
 		logToFile(e);
-		if(e instanceof CouponSystemException) {
-			//Do something
+		if (e instanceof CouponSystemException) {
+			// Do something
 		}
-		if(e instanceof SQLException) {
+		if (e instanceof SQLException) {
 //			System.out.println("SQL Exception. Inaal Rabak");
 		}
-		if(e instanceof InterruptedException) {
+		if (e instanceof InterruptedException) {
 			
 		}
-		
+		if(e instanceof ParseException) {
+			
+		}
+
 	}
 
 	private static void logToFile(Exception e) {
-		String today = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").format(new Date());
-		StringBuilder sb = new StringBuilder(today);
+		String now = new SimpleDateFormat("HH:mm:ss").format(new Date());
+		StringBuilder sb = new StringBuilder(now);
 		sb.append(" : ").append(e.toString());
-do {
-		for (StackTraceElement element : e.getStackTrace()) {
-			sb.append("\n").append(element).append("\n");
-		}
-		e = (Exception)e.getCause();
-		}
-	while(e != null) ;
-sb.append("\n");
+		do {
+			for (StackTraceElement element : e.getStackTrace()) {
+				sb.append("\n").append(element).append("\n");
+			}
+			e = (Exception) e.getCause();
+		} while (e != null);
+		sb.append("\n");
 		String trace = sb.toString();
-		Path file = Paths.get(fileName);
-		if(Files.notExists(file, LinkOption.NOFOLLOW_LINKS)) {
+		File directory = new File(filePath);
+		File file = new File(
+				filePath + fileName + " " + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + fileExtension);
+		if (!directory.exists()) {
+			directory.mkdirs();
+		}
+		if (!file.exists()) {
 			try {
-				Files.createFile(file );
+				file.createNewFile();
 			} catch (IOException e1) {
-				System.out.println("IO Exception");
 				System.out.println("Could not create file");
 			}
 		}
-		try (FileWriter writer = new FileWriter(fileName,true);
-				BufferedWriter bfWriter = new BufferedWriter(writer);){
-			
+		try (FileWriter writer = new FileWriter(file, true);
+				BufferedWriter bfWriter = new BufferedWriter(writer);) {
 			bfWriter.write(trace);
 		} catch (IOException e1) {
 			System.out.println("IO Exception");
