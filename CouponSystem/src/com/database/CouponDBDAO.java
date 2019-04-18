@@ -207,4 +207,22 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		connection = null;
 	}
 
+	@Override
+	public boolean exists(int customerId, int companyId) throws CouponSystemException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void addPurchase(int customerId, int companyId) throws CouponSystemException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deletePurchase(int customerId, int companyId) throws CouponSystemException {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
