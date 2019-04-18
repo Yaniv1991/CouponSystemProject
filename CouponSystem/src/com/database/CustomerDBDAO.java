@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class CustomerDBDAO implements DAO<Customer> {
+public class CustomerDBDAO implements UserDAO<Customer> {
 
 	private Connection connection;
 
@@ -20,16 +20,16 @@ public class CustomerDBDAO implements DAO<Customer> {
 	private static String sqlDelete = "delete from customers where id = ?";
 
 	@Override
-	public boolean exists(String...arguments) throws CouponSystemException {
+	public boolean exists(String email, String password) throws CouponSystemException {
 		boolean result = false;
 		connect();
-		String email = arguments[0];
-		String password = arguments[1];
+//		String email = arguments[0];
+//		String password = arguments[1];
 		if(email.isEmpty() || password.isEmpty()) {
 			throw new CouponSystemException("Password or Email were empty");
 		}
 		try (Statement stmt = connection.createStatement()) {
-			String sql = "select * from customers where email = '" + email + "'" + " and password = '" + password + "'";
+			String sql = "select * from customers where email = '" + email + "'" + " , password = '" + password + "'";
 			ResultSet rs = stmt.executeQuery(sql);
 			result = rs.next();
 			disconnect();
@@ -155,5 +155,25 @@ public class CustomerDBDAO implements DAO<Customer> {
 		result.setEmail(rs.getString("email"));
 		result.setPassword(rs.getString("password"));
 		return result;
+	}
+
+	@Override
+	public int getIdByEmail(String email) throws CouponSystemException {
+		int id = -1;
+		try (Statement stmt = connection.createStatement()) {
+			String sql = "select * from customers where email = '" + email + "'";
+			ResultSet rs = stmt.executeQuery(sql);
+			 if(rs.next()) {
+				 id = rs.getInt("id");
+			 }
+			disconnect();
+		} catch (SQLException e) {
+			DbExceptionHandler.HandleException(e);
+		}
+		if(id==-1) {
+			throw new CouponSystemException("email not found");
+		}
+		
+		return id;
 	}
 }

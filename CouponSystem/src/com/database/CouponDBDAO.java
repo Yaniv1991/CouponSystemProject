@@ -10,7 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class CouponDBDAO implements DAO<Coupon> {
+public class CouponDBDAO implements ElementDAO<Coupon> {
 //TODO Change the sqlCreate Statement
 	private static String sqlCreate = "insert into coupons "
 			+ "(id,title,start_date,end_date,amount,type,description,price,image) " + "values (?,?,?,?,?,?,?,?,?)";
@@ -169,34 +169,35 @@ public class CouponDBDAO implements DAO<Coupon> {
 		return result;
 	}
 
-	// FIXME Do an elegant override for dis shiet
-	@Override
-	public boolean exists(String... arguments) throws CouponSystemException {
-
-		boolean result = false;
-		int id;
-		if (arguments.length!=1) {
-			throw new CouponSystemException("invalid arguments. CouponDao Accepts only an id of type int");
-		}
-		try {
-			id = Integer.parseInt(arguments[0]);
-		}
-		catch(NumberFormatException e) {
-			throw new CouponSystemException("invalid arguments. CouponDao Accepts only an id of type int",e);
-		}
-		connect();
-		try (PreparedStatement read = connection.prepareStatement(sqlRead)) {
-			read.setInt(1, id);
-			ResultSet rs = read.executeQuery();
-			result = rs.next();
-		} catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
-		} finally {
-			disconnect();
-		}
-		return result;
+	{
+//	// FIXME Do an elegant override for dis shiet
+//	@Override
+//	public boolean exists(String... arguments) throws CouponSystemException {
+//
+//		boolean result = false;
+//		int id;
+//		if (arguments.length!=1) {
+//			throw new CouponSystemException("invalid arguments. CouponDao Accepts only an id of type int");
+//		}
+//		try {
+//			id = Integer.parseInt(arguments[0]);
+//		}
+//		catch(NumberFormatException e) {
+//			throw new CouponSystemException("invalid arguments. CouponDao Accepts only an id of type int",e);
+//		}
+//		connect();
+//		try (PreparedStatement read = connection.prepareStatement(sqlRead)) {
+//			read.setInt(1, id);
+//			ResultSet rs = read.executeQuery();
+//			result = rs.next();
+//		} catch (SQLException e) {
+//			DbExceptionHandler.HandleException(e);
+//		} finally {
+//			disconnect();
+//		}
+//		return result;
+//	}
 	}
-
 	private synchronized void connect() throws CouponSystemException {
 		connection = ConnectionPool.getInstance().getConnection();
 	}
