@@ -48,7 +48,7 @@ public class CouponExpirationDailyJob implements Runnable {
 
 		for (Coupon expiredCoupon : expiredCoupons) {
 			try {
-				if (dao.exists(String.valueOf(expiredCoupon.getId()))) {
+				if (dao.exists(expiredCoupon.getCompanyId(),expiredCoupon.getId())) {
 					return false;
 				}
 			} catch (CouponSystemException e) {

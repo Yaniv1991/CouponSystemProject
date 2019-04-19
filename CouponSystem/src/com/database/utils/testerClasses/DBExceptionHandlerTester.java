@@ -1,4 +1,4 @@
-package com.database.utils;
+package com.database.utils.testerClasses;
 
 import java.io.IOException;
 import java.sql.SQLException;

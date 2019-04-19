@@ -37,13 +37,24 @@ public class ConnectionPool {
 	public synchronized void closeAllConnections() {
 		poolIsClosing = true;
 		int numberOfClosedConnections = 0;
+		Set<Connection> connectionsToRemove = new HashSet<>();
 		while (numberOfClosedConnections < MAX_CONNECTIONS) {
 			try {
 				for (Connection connection : connections) {
 					connection.close();
+					connectionsToRemove.add(connection);
 					numberOfClosedConnections++;
 				}
-				wait();
+				
+				for (Connection connection : connectionsToRemove) {
+					connections.remove(connection);
+				}
+				connectionsToRemove.clear();
+				
+				if (numberOfClosedConnections < MAX_CONNECTIONS ) {
+					wait();
+				}
+				
 			} catch (SQLException | InterruptedException e) {
 				DbExceptionHandler.HandleException(e);
 			}

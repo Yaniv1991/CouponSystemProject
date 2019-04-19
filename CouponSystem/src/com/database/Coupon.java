@@ -4,7 +4,15 @@ package com.database;
 import java.util.Date;
 
 public class Coupon {
-	private int id,companyId;
+	private int id,companyId,categoryId;
+	public int getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(int categoryId) {
+		this.categoryId = categoryId;
+	}
+
 	private int amount;
 	private String title, description;
 	private Category category;
@@ -143,23 +151,26 @@ public class Coupon {
 		super();
 	}
 
-	public Coupon(int id, int amount, String title, String message, Category couponType, double price, Date startDate,
-			Date endDate, String image) {
-		super();
-		this.id = id;
-		this.amount = amount;
-		this.title = title;
-		this.description = message;
-		this.category = couponType;
-		this.price = price;
-		this.startDate = startDate;
-		this.endDate = endDate;
-		this.image = image;
-	}
 
 	public Coupon(int id) {
 		super();
 		this.id = id;
+	}
+
+	public Coupon(int id, int companyId, int categoryId, int amount, String title, String description,
+			Category category, double price, Date startDate, Date endDate, String image) {
+		super();
+		this.id = id;
+		this.companyId = companyId;
+		this.categoryId = categoryId;
+		this.amount = amount;
+		this.title = title;
+		this.description = description;
+		this.category = category;
+		this.price = price;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.image = image;
 	}
 	
 

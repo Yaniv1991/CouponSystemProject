@@ -13,12 +13,12 @@ import java.sql.Statement;
 public class CouponDBDAO implements ElementDAO<Coupon> {
 //TODO Change the sqlCreate Statement
 	private static String sqlCreate = "insert into coupons "
-			+ "(id,title,start_date,end_date,amount,type,description,price,image) " + "values (?,?,?,?,?,?,?,?,?)";
+			+ "(company_id,category_id,title,start_date,end_date,amount,type,description,price,image) " + "values (?,?,?,?,?,?,?,?,?,?)";
 
 	private static String sqlRead = "select * from coupons where id = ?";
 
 	private static String sqlUpdate = "update coupons set " + "title = ?, Start_date = ?, end_date = ?,"
-			+ "amount = ? , category = ? , description = ?," + "price = ? ,image = ? where id = ?";
+			+ "amount = ? , category = ? , description = ?,"  + "company_id = ? , category_id = ? ,"+ "price = ? ,image = ? where id = ?";
 
 	private static String sqlDelete = "delete from coupons where id = ?";
 
@@ -26,19 +26,24 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 
 	@Override
 	public void create(Coupon coupon) throws CouponSystemException {
+		
+//		 "insert into coupons "
+//					+ "(company_id,category_id,title,start_date,end_date,amount,type,description,price,image) " + "values (?,?,?,?,?,?,?,?,?,?)"
+		
 		connect();
 		try (PreparedStatement create = connection.prepareStatement(sqlCreate)) {
 			java.sql.Date startDate = (Date) coupon.getStartDate();
 			java.sql.Date endDate = (Date) coupon.getEndDate();
-			create.setInt(1, coupon.getId());
-			create.setString(2, coupon.getTitle());
-			create.setDate(3, startDate);
-			create.setDate(4, endDate);
-			create.setInt(5, coupon.getAmount());
-			create.setString(6, coupon.getCouponType().toString());
-			create.setString(7, coupon.getMessage());
-			create.setDouble(8, coupon.getPrice());
-			create.setString(9, coupon.getImage());
+			create.setInt(1, coupon.getCompanyId());
+			create.setInt(2, coupon.getCategoryId());
+			create.setString(3, coupon.getTitle());
+			create.setDate(4, startDate);
+			create.setDate(5, endDate);
+			create.setInt(6, coupon.getAmount());
+			create.setString(7, coupon.getCouponType().toString());
+			create.setString(8, coupon.getMessage());
+			create.setDouble(9, coupon.getPrice());
+			create.setString(10, coupon.getImage());
 
 			create.execute();
 		} catch (Exception e) {
@@ -93,11 +98,9 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 
 	@Override
 	public void update(Coupon coupon) throws CouponSystemException {
-		/*
-		 * "update coupon set " + "title = ?, Start_date = ?, end_date = ?," +
-		 * "amount = ? , category = ? , description = ?," +
-		 * "price = ? ,image = ? where id = ?"
-		 */
+
+//		"update coupons set " + "title = ?, Start_date = ?, end_date = ?,"
+//				+ "amount = ? , category = ? , description = ?,"  + "company_id = ? , category_id = ? ,"+ "price = ? ,image = ? where id = ?"
 
 		connect();
 		try (PreparedStatement update = connection.prepareStatement(sqlUpdate)) {
@@ -107,9 +110,11 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 			update.setInt(4, coupon.getAmount());
 			update.setString(5, coupon.getCategory().toString());
 			update.setString(6, coupon.getDescription());
-			update.setDouble(7, coupon.getPrice());
-			update.setString(8, coupon.getImage());
-			update.setInt(9, coupon.getId());
+			update.setInt(7, coupon.getCompanyId());
+			update.setInt(8, coupon.getCategoryId());
+			update.setDouble(9, coupon.getPrice());
+			update.setString(10, coupon.getImage());
+			update.setInt(11, coupon.getId());
 			update.execute();
 		} catch (SQLException e) {
 			DbExceptionHandler.HandleException(e);
@@ -169,35 +174,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		return result;
 	}
 
-	{
-//	// FIXME Do an elegant override for dis shiet
-//	@Override
-//	public boolean exists(String... arguments) throws CouponSystemException {
-//
-//		boolean result = false;
-//		int id;
-//		if (arguments.length!=1) {
-//			throw new CouponSystemException("invalid arguments. CouponDao Accepts only an id of type int");
-//		}
-//		try {
-//			id = Integer.parseInt(arguments[0]);
-//		}
-//		catch(NumberFormatException e) {
-//			throw new CouponSystemException("invalid arguments. CouponDao Accepts only an id of type int",e);
-//		}
-//		connect();
-//		try (PreparedStatement read = connection.prepareStatement(sqlRead)) {
-//			read.setInt(1, id);
-//			ResultSet rs = read.executeQuery();
-//			result = rs.next();
-//		} catch (SQLException e) {
-//			DbExceptionHandler.HandleException(e);
-//		} finally {
-//			disconnect();
-//		}
-//		return result;
-//	}
-	}
+
 	private synchronized void connect() throws CouponSystemException {
 		connection = ConnectionPool.getInstance().getConnection();
 	}
