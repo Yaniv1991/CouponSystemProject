@@ -16,7 +16,7 @@ static long sleepTime = 200;
 
 	static Runnable getConnections = new Runnable()  {
 		public synchronized void run() {
-			for (int i = 0; i < 8; i++) {
+			for (int i = 0; i < 10; i++) {
 				Connection connection;
 				try {
 					connection = ConnectionPool.getInstance().getConnection();

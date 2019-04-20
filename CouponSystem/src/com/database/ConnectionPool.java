@@ -16,14 +16,16 @@ public class ConnectionPool {
 
 	private ConnectionPool() {
 		// add 10 connections to the set.
-		try {
-			for (int i = 0; i < MAX_CONNECTIONS; i++) {
-				connections.add(DriverManager.getConnection(url));
+		while (connections.size() < 10) {
+			try {
+				for (int i = 0; i < MAX_CONNECTIONS; i++) {
+					connections.add(DriverManager.getConnection(url));
+				}
 			}
-		}
 
-		catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
+			catch (SQLException e) {
+				DbExceptionHandler.HandleException(e);
+			}
 		}
 	}
 
@@ -37,24 +39,19 @@ public class ConnectionPool {
 	public synchronized void closeAllConnections() {
 		poolIsClosing = true;
 		int numberOfClosedConnections = 0;
-		Set<Connection> connectionsToRemove = new HashSet<>();
 		while (numberOfClosedConnections < MAX_CONNECTIONS) {
 			try {
 				for (Connection connection : connections) {
 					connection.close();
-					connectionsToRemove.add(connection);
 					numberOfClosedConnections++;
 				}
-				
-				for (Connection connection : connectionsToRemove) {
-					connections.remove(connection);
-				}
-				connectionsToRemove.clear();
-				
-				if (numberOfClosedConnections < MAX_CONNECTIONS ) {
+
+				connections.clear();
+
+				if (numberOfClosedConnections < MAX_CONNECTIONS) {
 					wait();
 				}
-				
+
 			} catch (SQLException | InterruptedException e) {
 				DbExceptionHandler.HandleException(e);
 			}
