@@ -16,7 +16,6 @@ public class ConnectionPool {
 
 	private ConnectionPool() {
 		// add 10 connections to the set.
-		//
 		while (connections.size() < MAX_CONNECTIONS) {
 			try {
 				for (int i = 0; i < MAX_CONNECTIONS; i++) {
