@@ -16,7 +16,7 @@ public class ConnectionPool {
 
 	private ConnectionPool() {
 		// add 10 connections to the set.
-		while (connections.size() < 10) {
+		while (connections.size() < MAX_CONNECTIONS) {
 			try {
 				for (int i = 0; i < MAX_CONNECTIONS; i++) {
 					connections.add(DriverManager.getConnection(url));
