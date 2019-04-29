@@ -1,5 +1,7 @@
 package com.clients;
 
-public class ClientFacade extends Facade{
+public abstract class ClientFacade {
+	
+	abstract boolean login (String email, String password);
 
 }
