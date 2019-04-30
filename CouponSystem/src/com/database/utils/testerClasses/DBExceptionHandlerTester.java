@@ -3,8 +3,8 @@ package com.database.utils.testerClasses;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import com.database.CouponSystemException;
 import com.database.DbExceptionHandler;
+import com.database.exception.CouponSystemException;
 
 public class DBExceptionHandlerTester {
 

@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.database.ConnectionPool;
-import com.database.CouponSystemException;
+import com.database.exception.CouponSystemException;
 
 public class ConnectionPoolTester {
 	static List<Connection> connections = new LinkedList<>();

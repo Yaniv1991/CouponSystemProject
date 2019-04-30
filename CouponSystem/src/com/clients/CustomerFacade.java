@@ -11,6 +11,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import com.database.*;
+import com.database.exception.CouponSystemException;
 //revised
 public class CustomerFacade extends ClientFacade{
 

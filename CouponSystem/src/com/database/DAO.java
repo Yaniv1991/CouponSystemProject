@@ -2,6 +2,8 @@ package com.database;
 
 import java.util.Collection;
 
+import com.database.exception.CouponSystemException;
+
 public interface DAO <T>{
 	
 	void create(T t) throws CouponSystemException;

@@ -10,9 +10,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.database.exception.CouponSystemException;
+
 public class CompanyDBDAO implements UserDAO<Company> {
 
-	private ConnectionPool connectionPool = ConnectionPool.getInstance();
+//	private ConnectionPool connectionPool = ConnectionPool.getInstance();
 
 	private static String sqlCreate = "insert into companies (name,email,password) values(?,?,?)";
 	private static String sqlRead = "select * from companies where id = ?";
@@ -141,12 +143,12 @@ public class CompanyDBDAO implements UserDAO<Company> {
 
 	private synchronized void connect() throws CouponSystemException {
 		if (connection == null) {
-			connection = connectionPool.getConnection();
+			connection = ConnectionPool.getInstance().getConnection();
 		}
 	}
 
-	private synchronized void disconnect() throws SQLException {
-		connectionPool.restoreConnection(connection);
+	private synchronized void disconnect() throws CouponSystemException {
+		ConnectionPool.getInstance().restoreConnection(connection);
 		connection = null;
 	}
 
@@ -170,7 +172,7 @@ public class CompanyDBDAO implements UserDAO<Company> {
 	public int getIdByEmail(String email) throws CouponSystemException {
 		int id = -1;
 		try (Statement stmt = connection.createStatement()) {
-			String sql = "select * from companies where email = '" + email + "'";
+			String sql = "select id from companies where email = '" + email + "'";
 			ResultSet rs = stmt.executeQuery(sql);
 			 if(rs.next()) {
 				 id = rs.getInt("id");

@@ -6,15 +6,17 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.database.exception.CouponSystemException;
+
 public class ConnectionPool {
 
 	private static final int MAX_CONNECTIONS = 10;
-	private static ConnectionPool instance = new ConnectionPool();
+	private static ConnectionPool instance;
 	private Set<Connection> connections = new HashSet<>();
 	private String url = "jdbc:derby://localhost:1527/db1";
 	private boolean poolIsClosing = false;
 
-	private ConnectionPool() {
+	private ConnectionPool() throws CouponSystemException {
 		// add 10 connections to the set.
 		while (connections.size() < MAX_CONNECTIONS) {
 			try {
@@ -24,19 +26,19 @@ public class ConnectionPool {
 			}
 
 			catch (SQLException e) {
-				DbExceptionHandler.HandleException(e);
+				throw new CouponSystemException("Sql exception caused by Connection pool",e);
 			}
 		}
 	}
 
-	public static ConnectionPool getInstance() {
-		if (instance == null) {
-			instance = new ConnectionPool();
+	public static ConnectionPool getInstance() throws CouponSystemException {
+		while (instance == null) {
+				instance = new ConnectionPool();
 		}
 		return instance;
 	}
 
-	public synchronized void closeAllConnections() {
+	public synchronized void closeAllConnections() throws CouponSystemException {
 		poolIsClosing = true;
 		int numberOfClosedConnections = 0;
 		while (numberOfClosedConnections < MAX_CONNECTIONS) {
@@ -53,7 +55,7 @@ public class ConnectionPool {
 				}
 
 			} catch (SQLException | InterruptedException e) {
-				DbExceptionHandler.HandleException(e);
+				throw new CouponSystemException("Exception raised in closing all connections", e);
 			}
 		}
 	}
@@ -71,7 +73,7 @@ public class ConnectionPool {
 			try {
 				wait();
 			} catch (InterruptedException e) {
-				DbExceptionHandler.HandleException(e);
+				throw new CouponSystemException("Thread interrupted while getting a connection", e);
 
 			}
 		}

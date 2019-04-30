@@ -3,6 +3,9 @@ package com.database;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import com.database.exception.CouponSystemException;
+
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -46,8 +49,8 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 			create.setString(10, coupon.getImage());
 
 			create.execute();
-		} catch (Exception e) {
-			DbExceptionHandler.HandleException(e);
+		} catch (SQLException e) {
+			throw new CouponSystemException("error in creating coupon",e);
 		}
 		finally {disconnect();}
 	}
@@ -66,7 +69,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 			}
 
 		} catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
+			throw new CouponSystemException("error in reading coupon",e);
 		}
 		finally {disconnect();}
 		return result;
@@ -117,7 +120,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 			update.setInt(11, coupon.getId());
 			update.execute();
 		} catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
+			throw new CouponSystemException("error in updating coupon " + coupon ,e);
 		} finally {
 			disconnect();
 		}
@@ -130,7 +133,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 			delete.setInt(1, id);
 			delete.execute();
 		} catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
+			throw new CouponSystemException("error in deleting coupon",e);
 		} finally {
 			disconnect();
 		}
@@ -148,7 +151,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 			}
 
 		} catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
+			throw new CouponSystemException("",e);;
 		} finally {
 			disconnect();
 		}
@@ -166,7 +169,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 			}
 
 		} catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
+			throw new CouponSystemException("Exception raised in reading all coupons",e);
 		} finally {
 			disconnect();
 		}
@@ -179,7 +182,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		connection = ConnectionPool.getInstance().getConnection();
 	}
 
-	private synchronized void disconnect() {
+	private synchronized void disconnect() throws CouponSystemException {
 		ConnectionPool.getInstance().restoreConnection(connection);
 		connection = null;
 	}

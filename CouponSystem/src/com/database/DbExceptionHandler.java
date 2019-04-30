@@ -9,6 +9,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.database.exception.CouponSystemException;
+
 public class DbExceptionHandler {
 	private static String fileName = "DBExceptionLogger";
 	private static String filePath = "D:\\Exceptions\\";
@@ -17,21 +19,21 @@ public class DbExceptionHandler {
 	// TODO throw non-connection related exceptions into a
 	// ProgramExceptionHandler for further logging
 
-	public static void HandleException(Exception e) {
+	public static void HandleException(Exception e) throws CouponSystemException {
 		logToFile(e);
-		if (e instanceof CouponSystemException) {
-			// Do something
-		}
+	String message = null;
 		if (e instanceof SQLException) {
 //			System.out.println("SQL Exception. Inaal Rabak");
+			message = "SQL exception";
 		}
 		if (e instanceof InterruptedException) {
-			
+			message = "Interruped by";
 		}
 		if(e instanceof ParseException) {
 			
 		}
 
+		throw new CouponSystemException(message ,e);
 	}
 
 	private static void logToFile(Exception e) {
