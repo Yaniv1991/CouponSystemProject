@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.database.exception.CouponException;
 import com.database.exception.CouponSystemException;
 
 import java.sql.Connection;
@@ -189,20 +190,33 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 
 	@Override
 	public boolean exists(int customerId, int companyId) throws CouponSystemException {
-		// TODO Auto-generated method stub
-		return false;
+		boolean result = false;
+		connect();
+		String preparedSql = "select * from customers_vs_coupons where customer_id = ? , coupon_id = ?";
+		try(PreparedStatement read = connection.prepareStatement(preparedSql)){
+			read.setInt(1, customerId);
+			read.setInt(2, companyId);
+			ResultSet rs = read.executeQuery();
+			result = rs.next();
+			
+		} catch (SQLException e) {
+			throw new CouponException("error in fetching coupon from customers_vs_coupons",e);
+		}
+		finally {
+			disconnect();
+		}
+		return result;
 	}
 
 	@Override
 	public void addPurchase(int customerId, int companyId) throws CouponSystemException {
-		// TODO Auto-generated method stub
+		//TODO 
 		
 	}
 
 	@Override
 	public void deletePurchase(int customerId, int companyId) throws CouponSystemException {
-		// TODO Auto-generated method stub
-		
-	}
+		//TODO
+		}
 
 }

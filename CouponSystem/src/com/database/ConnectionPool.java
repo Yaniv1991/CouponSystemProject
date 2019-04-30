@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.database.exception.CouponSystemException;
+import com.database.exception.ConnectionException;
 
 public class ConnectionPool {
 
@@ -16,7 +16,7 @@ public class ConnectionPool {
 	private String url = "jdbc:derby://localhost:1527/db1";
 	private boolean poolIsClosing = false;
 
-	private ConnectionPool() throws CouponSystemException {
+	private ConnectionPool() throws ConnectionException {
 		// add 10 connections to the set.
 		while (connections.size() < MAX_CONNECTIONS) {
 			try {
@@ -26,19 +26,19 @@ public class ConnectionPool {
 			}
 
 			catch (SQLException e) {
-				throw new CouponSystemException("Sql exception caused by Connection pool",e);
+				throw new ConnectionException("Sql exception caused by Connection pool",e);
 			}
 		}
 	}
 
-	public static ConnectionPool getInstance() throws CouponSystemException {
+	public static ConnectionPool getInstance() throws ConnectionException {
 		while (instance == null) {
 				instance = new ConnectionPool();
 		}
 		return instance;
 	}
 
-	public synchronized void closeAllConnections() throws CouponSystemException {
+	public synchronized void closeAllConnections() throws ConnectionException {
 		poolIsClosing = true;
 		int numberOfClosedConnections = 0;
 		while (numberOfClosedConnections < MAX_CONNECTIONS) {
@@ -55,7 +55,7 @@ public class ConnectionPool {
 				}
 
 			} catch (SQLException | InterruptedException e) {
-				throw new CouponSystemException("Exception raised in closing all connections", e);
+				throw new ConnectionException("Exception raised in closing all connections", e);
 			}
 		}
 	}
@@ -65,15 +65,15 @@ public class ConnectionPool {
 		notify();
 	}
 
-	public synchronized Connection getConnection() throws CouponSystemException {
+	public synchronized Connection getConnection() throws ConnectionException {
 		if (poolIsClosing) {
-			throw new CouponSystemException("Pool is closing");
+			throw new ConnectionException("Pool is closing");
 		}
 		while (connections.isEmpty()) {
 			try {
 				wait();
 			} catch (InterruptedException e) {
-				throw new CouponSystemException("Thread interrupted while getting a connection", e);
+				throw new ConnectionException("Thread interrupted while getting a connection", e);
 
 			}
 		}
