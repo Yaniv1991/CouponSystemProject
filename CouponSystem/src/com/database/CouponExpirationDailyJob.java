@@ -22,10 +22,9 @@ public class CouponExpirationDailyJob implements Runnable {
 				expiredCoupons = (List<Coupon>) dao.readAll();
 				removeUnexpiredCouponsFromList();
 				removeExpiredCouponsFromDB();
-				if (!allCouponsWereDeleted()) {
-					throw new CouponSystemException("Daily job could not delete all coupons");
+				if (allCouponsWereDeleted()) {
+					expiredCoupons.clear();
 				}
-				expiredCoupons.clear();
 				
 				Thread.sleep(sleepTime);
 			} catch (CouponSystemException | InterruptedException e) {
@@ -45,7 +44,7 @@ public class CouponExpirationDailyJob implements Runnable {
 	private boolean allCouponsWereDeleted() throws CouponSystemException {
 
 		for (Coupon expiredCoupon : expiredCoupons) {
-				if (dao.exists(expiredCoupon.getCompanyId(),expiredCoupon.getId())) {
+				if (dao.read(expiredCoupon.getId()) != null) {
 					return false;
 			}
 		}

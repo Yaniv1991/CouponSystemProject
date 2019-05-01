@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.List;
 
 import com.database.exception.ConnectionException;
-import com.database.exception.CouponSystemException;
 import com.database.exception.CustomerException;
 
 public class CustomerDBDAO implements UserDAO<Customer> {
@@ -24,13 +23,13 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 	private static String sqlDelete = "delete from customers where id = ?";
 
 	@Override
-	public boolean exists(String email, String password) throws CouponSystemException {
+	public boolean exists(String email, String password) throws CustomerException {
 		boolean result = false;
 		connect();
 //		String email = arguments[0];
 //		String password = arguments[1];
 		if(email.isEmpty() || password.isEmpty()) {
-			throw new CouponSystemException("Password or Email were empty");
+			throw new CustomerException("Password or Email were empty");
 		}
 		try (Statement stmt = connection.createStatement()) {
 			String sql = "select * from customers where email = '" + email + "'" + " , password = '" + password + "'";
@@ -45,7 +44,7 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 	}
 
 	@Override
-	public void create(Customer customer) throws CouponSystemException {
+	public void create(Customer customer) throws CustomerException {
 		// "insert into customers (first_name,last_name,password,email) VALUES(?,?,?,?)"
 		connect();
 		try (PreparedStatement create = connection.prepareStatement(sqlCreate)) {
@@ -62,7 +61,7 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 	}
 
 	@Override
-	public Customer read(int id) throws CouponSystemException {
+	public Customer read(int id) throws CustomerException {
 		// "select * from customers where id = ?"
 		Customer result = null;
 		connect();
@@ -75,7 +74,7 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 
 
 	@Override
-	public void update(Customer customer) throws CouponSystemException{
+	public void update(Customer customer) throws CustomerException{
 		// "update customers set first_name = ?
 		// , last_name = ? , password = ? , email = ? WHERE id = ?"
 		connect();
@@ -95,7 +94,7 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 	}
 
 	@Override
-	public void delete(int id) throws CouponSystemException{
+	public void delete(int id) throws CustomerException{
 		connect();
 		try(PreparedStatement delete = connection.prepareStatement(sqlDelete)){
 			delete.setInt(1, id);
@@ -107,7 +106,7 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 	}
 
 	@Override
-	public Collection<Customer> readAll() throws CouponSystemException{
+	public Collection<Customer> readAll() throws CustomerException{
 		List<Customer> result = new ArrayList<>();
 		connect();
 		String sqlReadAll = "select * from customers";
@@ -124,18 +123,26 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 		return result;
 	}
 
-	private synchronized void connect() throws ConnectionException {
+	private synchronized void connect() throws CustomerException {
 		if (connection == null) {
-			connection = ConnectionPool.getInstance().getConnection();
+			try {
+				connection = ConnectionPool.getInstance().getConnection();
+			} catch (ConnectionException e) {
+				throw new CustomerException("error in connecting",e);
+			}
 		}
 	}
 
-	private synchronized void disconnect() throws ConnectionException {
-		ConnectionPool.getInstance().restoreConnection(connection);
+	private synchronized void disconnect() throws CustomerException {
+		try {
+			ConnectionPool.getInstance().restoreConnection(connection);
+		} catch (ConnectionException e) {
+			throw new CustomerException("error in disconnecting",e);
+		}
 		connection = null;
 	}
 	
-	private Customer readFromConnection(int id) throws CouponSystemException {
+	private Customer readFromConnection(int id) throws CustomerException {
 		Customer result = null;
 		try (PreparedStatement read = connection.prepareStatement(sqlRead)) {
 			read.setInt(1, id);
@@ -162,7 +169,7 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 	}
 
 	@Override
-	public int getIdByEmail(String email) throws CouponSystemException {
+	public int getIdByEmail(String email) throws CustomerException {
 		int id = -1;
 		try (Statement stmt = connection.createStatement()) {
 			String sql = "select * from customers where email = '" + email + "'";
