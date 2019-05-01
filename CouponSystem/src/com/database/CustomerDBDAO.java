@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.database.exception.ConnectionException;
 import com.database.exception.CouponSystemException;
+import com.database.exception.CustomerException;
 
 public class CustomerDBDAO implements UserDAO<Customer> {
 
@@ -122,18 +124,18 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 		return result;
 	}
 
-	private synchronized void connect() throws CouponSystemException {
+	private synchronized void connect() throws ConnectionException {
 		if (connection == null) {
 			connection = ConnectionPool.getInstance().getConnection();
 		}
 	}
 
-	private synchronized void disconnect() {
+	private synchronized void disconnect() throws ConnectionException {
 		ConnectionPool.getInstance().restoreConnection(connection);
 		connection = null;
 	}
 	
-	private Customer readFromConnection(int id) {
+	private Customer readFromConnection(int id) throws CouponSystemException {
 		Customer result = null;
 		try (PreparedStatement read = connection.prepareStatement(sqlRead)) {
 			read.setInt(1, id);
@@ -143,7 +145,7 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 			}
 
 		} catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
+			throw new CustomerException("error in reading from connection", e);
 		}
 		return result;
 	}
@@ -173,7 +175,7 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 			DbExceptionHandler.HandleException(e);
 		}
 		if(id==-1) {
-			throw new CouponSystemException("email not found");
+			throw new CustomerException("email not found");
 		}
 		
 		return id;

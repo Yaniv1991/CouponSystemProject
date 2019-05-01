@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.database.ConnectionPool;
+import com.database.exception.ConnectionException;
 import com.database.exception.CouponSystemException;
 
 public class ConnectionPoolTester {
@@ -37,7 +38,12 @@ static long sleepTime = 200;
 		
 		public synchronized void run(){
 			for (int i = 0; i < connections.size(); ) {
-					ConnectionPool.getInstance().restoreConnection(connections.get(0));
+					try {
+						ConnectionPool.getInstance().restoreConnection(connections.get(0));
+					} catch (ConnectionException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					connections.remove(0);
 					System.out.println("Connection restored");
 					try {

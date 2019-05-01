@@ -16,10 +16,8 @@ public class DbExceptionHandler {
 	private static String filePath = "D:\\Exceptions\\";
 	private static String fileExtension = ".txt";
 
-	// TODO throw non-connection related exceptions into a
-	// ProgramExceptionHandler for further logging
 
-	public static void HandleException(Exception e) throws CouponSystemException {
+	public static void HandleException(Exception e)  {
 		logToFile(e);
 	String message = null;
 		if (e instanceof SQLException) {
@@ -27,13 +25,12 @@ public class DbExceptionHandler {
 			message = "SQL exception";
 		}
 		if (e instanceof InterruptedException) {
-			message = "Interruped by";
+			message = "Interruped by " + e.getClass();
 		}
 		if(e instanceof ParseException) {
 			
 		}
 
-		throw new CouponSystemException(message ,e);
 	}
 
 	private static void logToFile(Exception e) {

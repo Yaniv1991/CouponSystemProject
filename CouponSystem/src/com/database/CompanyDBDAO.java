@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.database.exception.CompanyException;
+import com.database.exception.CouponException;
 import com.database.exception.CouponSystemException;
 
 public class CompanyDBDAO implements UserDAO<Company> {
@@ -36,9 +38,11 @@ public class CompanyDBDAO implements UserDAO<Company> {
 			String sql = "select * from companies where email = '" + email + "'" + " and password = '" + password + "'";
 			ResultSet rs = stmt.executeQuery(sql);
 			result = rs.next();
-			disconnect();
 		} catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
+			throw new CompanyException("error in checking existance of company",e);
+		}
+		finally {
+			disconnect();
 		}
 
 		return result;
@@ -54,10 +58,11 @@ public class CompanyDBDAO implements UserDAO<Company> {
 			create.setString(2, company.getEmail());
 			create.setString(1, company.getPassword());
 			create.execute();
-			disconnect();
-
 		} catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
+			throw new CompanyException("error in creating company",e,company);
+		}
+		finally {
+			disconnect();
 		}
 	}
 
@@ -65,25 +70,23 @@ public class CompanyDBDAO implements UserDAO<Company> {
 	public Company read(int id) throws CouponSystemException {
 		Company result = null;
 		connect();
-		try {
 			result = readFromActiveConnection(id);
 			disconnect();
-		} catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
-		}
 		return result;
 	}
 
-	private Company createCompany(int id, ResultSet rs) throws SQLException {
+	private Company readFromActiveConnection(int id, ResultSet rs) throws  CompanyException {
 		Company result;
 		result = new Company(id);
+		try {
 		result.setName(rs.getString("name"));
 		result.setPassword(rs.getString("password"));
 		result.setEmail(rs.getString("email"));
-		try {
 			result.setCoupons((List<Coupon>) new CouponDBDAO().readAll());
+		} catch (SQLException e) {
+			throw new CompanyException("error in reading company", e,result);
 		} catch (CouponSystemException e) {
-			DbExceptionHandler.HandleException(e);
+			throw new CompanyException("error in reading coupons of company",e,result);
 		}
 		return result;
 	}
@@ -103,7 +106,7 @@ public class CompanyDBDAO implements UserDAO<Company> {
 			update.execute();
 			disconnect();
 		} catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
+			throw new CompanyException("error in updating company",e,company);
 		}
 	}
 
@@ -116,7 +119,7 @@ public class CompanyDBDAO implements UserDAO<Company> {
 			delete.execute();
 			disconnect();
 		} catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
+			throw new CompanyException("error in deleting company",e);
 		}
 
 	}
@@ -130,11 +133,11 @@ public class CompanyDBDAO implements UserDAO<Company> {
 			String sql = "select * from companies";
 			ResultSet rs = stmt.executeQuery(sql);
 			while (rs.next()) {
-				result.add(createCompany(rs.getInt("id"), rs));
+				result.add(readFromActiveConnection(rs.getInt("id"), rs));
 			}
 			disconnect();
 		} catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
+			throw new CompanyException("error in reading all companies",e);
 		}
 
 		return result;
@@ -152,18 +155,18 @@ public class CompanyDBDAO implements UserDAO<Company> {
 		connection = null;
 	}
 
-	private Company readFromActiveConnection(int id) {
+	private Company readFromActiveConnection(int id) throws CompanyException {
 		Company result = null;
 		try (PreparedStatement read = connection.prepareStatement(sqlRead)) {
 
 			read.setInt(1, id);
 			ResultSet rs = read.executeQuery();
 			if (rs.next()) {
-				result = createCompany(id, rs);
+				result = readFromActiveConnection(id, rs);
 			}
 
 		} catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
+			throw new CompanyException("error in reading company",e,result);
 		}
 		return result;
 	}
@@ -179,10 +182,10 @@ public class CompanyDBDAO implements UserDAO<Company> {
 			 }
 			disconnect();
 		} catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
+			throw new CompanyException("error in getting company id",e);
 		}
 		if(id==-1) {
-			throw new CouponSystemException("email not found");
+			throw new CompanyException("email not found");
 		}
 		
 		return id;

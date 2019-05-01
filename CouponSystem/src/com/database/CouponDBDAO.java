@@ -152,7 +152,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 			}
 
 		} catch (SQLException e) {
-			throw new CouponSystemException("",e);;
+			throw new CouponSystemException("error in reading all coupons",e);
 		} finally {
 			disconnect();
 		}
@@ -189,13 +189,13 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 	}
 
 	@Override
-	public boolean exists(int customerId, int companyId) throws CouponSystemException {
+	public boolean exists(int customerId, int couponId) throws CouponSystemException {
 		boolean result = false;
 		connect();
 		String preparedSql = "select * from customers_vs_coupons where customer_id = ? , coupon_id = ?";
 		try(PreparedStatement read = connection.prepareStatement(preparedSql)){
 			read.setInt(1, customerId);
-			read.setInt(2, companyId);
+			read.setInt(2, couponId);
 			ResultSet rs = read.executeQuery();
 			result = rs.next();
 			
@@ -209,14 +209,20 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 	}
 
 	@Override
-	public void addPurchase(int customerId, int companyId) throws CouponSystemException {
-		//TODO 
-		
+	public void addPurchase(int couponId) throws CouponSystemException {
+		readAndIncrement(couponId,1);
 	}
 
-	@Override
-	public void deletePurchase(int customerId, int companyId) throws CouponSystemException {
-		//TODO
-		}
 
+
+	@Override
+	public void deletePurchase(int couponId) throws CouponSystemException {
+		readAndIncrement(couponId, -1);
+		}
+	
+	private void readAndIncrement(int couponId,int increment) throws CouponSystemException {
+		Coupon coupon = read(couponId);
+		coupon.setAmount(coupon.getAmount()+increment);
+		update(coupon);
+	}
 }

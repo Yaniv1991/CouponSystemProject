@@ -36,26 +36,17 @@ public class CouponExpirationDailyJob implements Runnable {
 		}
 	}
 
-	private void removeExpiredCouponsFromDB() {
+	private void removeExpiredCouponsFromDB() throws CouponSystemException {
 		for (Coupon expiredCoupon : expiredCoupons) {
-			try {
 				dao.delete(expiredCoupon.getId());
-			} catch (CouponSystemException e) {
-				DbExceptionHandler.HandleException(e);
-			}
 		}
 	}
 
-	private boolean allCouponsWereDeleted() {
+	private boolean allCouponsWereDeleted() throws CouponSystemException {
 
 		for (Coupon expiredCoupon : expiredCoupons) {
-			try {
 				if (dao.exists(expiredCoupon.getCompanyId(),expiredCoupon.getId())) {
 					return false;
-				}
-			} catch (CouponSystemException e) {
-				DbExceptionHandler.HandleException(e);
-				return false;
 			}
 		}
 
