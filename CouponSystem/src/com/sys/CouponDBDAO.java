@@ -1,11 +1,14 @@
-package com.database;
+package com.sys;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.database.exception.ConnectionException;
-import com.database.exception.CouponException;
+import com.sys.beans.Category;
+import com.sys.beans.Company;
+import com.sys.beans.Coupon;
+import com.sys.exception.ConnectionException;
+import com.sys.exception.CouponException;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -15,7 +18,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class CouponDBDAO implements ElementDAO<Coupon> {
-//TODO Change the sqlCreate Statement
 	private static String sqlCreate = "insert into coupons "
 			+ "(company_id,category_id,title,start_date,end_date,amount,type,description,price,image) " + "values (?,?,?,?,?,?,?,?,?,?)";
 
@@ -25,7 +27,10 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 			+ "amount = ? , category = ? , description = ?,"  + "company_id = ? , category_id = ? ,"+ "price = ? ,image = ? where id = ?";
 
 	private static String sqlDelete = "delete from coupons where id = ?";
-
+	
+	private static String sqlDeleteHistory = "delete from cutomers_v_coupons where coupon_id = ?";
+	
+	
 	private Connection connection;
 
 	@Override
@@ -130,6 +135,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 	@Override
 	public void delete(int id) throws CouponException {
 		connect();
+		deleteHistory(id);
 		try (PreparedStatement delete = connection.prepareStatement(sqlDelete)) {
 			delete.setInt(1, id);
 			delete.execute();
@@ -232,5 +238,14 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		Coupon coupon = read(couponId);
 		coupon.setAmount(coupon.getAmount()+increment);
 		update(coupon);
+	}
+	
+	public void deleteHistory(int id) throws CouponException {
+		try (PreparedStatement delete = connection.prepareStatement(sqlDeleteHistory)) {
+			delete.setInt(1, id);
+			delete.execute();
+		} catch (SQLException e) {
+			throw new CouponException("error in deleting purchase history", e);
+		}
 	}
 }

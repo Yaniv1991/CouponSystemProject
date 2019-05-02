@@ -1,5 +1,5 @@
 //Ok
-package com.database;
+package com.sys.beans;
 
 import java.util.Date;
 

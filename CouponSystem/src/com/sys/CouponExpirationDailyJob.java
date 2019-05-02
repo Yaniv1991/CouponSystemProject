@@ -1,4 +1,4 @@
-package com.database;
+package com.sys;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -6,7 +6,8 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
-import com.database.exception.CouponSystemException;
+import com.sys.beans.Coupon;
+import com.sys.exception.CouponSystemException;
 
 public class CouponExpirationDailyJob implements Runnable {
 

@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Random;
 
-import com.database.Company;
+import com.sys.beans.Company;
 
 public class RandomGenerator {
 private static Random rnd = new Random();

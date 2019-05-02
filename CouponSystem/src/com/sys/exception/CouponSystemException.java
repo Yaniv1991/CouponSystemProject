@@ -1,4 +1,4 @@
-package com.database.exception;
+package com.sys.exception;
 
 public class CouponSystemException extends Exception{
 

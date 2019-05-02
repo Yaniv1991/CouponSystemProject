@@ -6,9 +6,9 @@ import java.sql.Connection;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.database.ConnectionPool;
-import com.database.exception.ConnectionException;
-import com.database.exception.CouponSystemException;
+import com.sys.ConnectionPool;
+import com.sys.exception.ConnectionException;
+import com.sys.exception.CouponSystemException;
 
 public class ConnectionPoolTesterCloseAllConnections {
 	static List<Connection> connections = new LinkedList<>();

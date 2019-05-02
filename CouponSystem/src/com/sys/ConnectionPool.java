@@ -1,4 +1,4 @@
-package com.database;
+package com.sys;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.database.exception.ConnectionException;
+import com.sys.exception.ConnectionException;
 
 public class ConnectionPool {
 

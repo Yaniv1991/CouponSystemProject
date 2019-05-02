@@ -1,6 +1,6 @@
-package com.database.exception;
+package com.sys.exception;
 
-import com.database.Coupon;
+import com.sys.beans.Coupon;
 
 public class CouponException extends CouponSystemException{
 

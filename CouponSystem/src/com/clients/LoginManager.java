@@ -1,8 +1,8 @@
 package com.clients;
 
-import com.database.CompanyDBDAO;
-import com.database.CustomerDBDAO;
-import com.database.exception.CouponSystemException;
+import com.sys.CompanyDBDAO;
+import com.sys.CustomerDBDAO;
+import com.sys.exception.CouponSystemException;
 
 public class LoginManager {
 private static LoginManager instance = new LoginManager();

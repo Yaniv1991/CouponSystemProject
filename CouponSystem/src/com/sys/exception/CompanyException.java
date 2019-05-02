@@ -1,6 +1,6 @@
-package com.database.exception;
+package com.sys.exception;
 
-import com.database.Company;
+import com.sys.beans.Company;
 
 public class CompanyException extends CouponSystemException{
 private Company company;

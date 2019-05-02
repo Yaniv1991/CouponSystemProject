@@ -1,6 +1,6 @@
-package com.database;
+package com.sys;
 
-import com.database.exception.CouponSystemException;
+import com.sys.exception.CouponSystemException;
 
 public interface UserDAO<T> extends DAO<T> {
 	boolean exists(String email, String password) throws CouponSystemException;

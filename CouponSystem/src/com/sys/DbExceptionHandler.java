@@ -1,4 +1,4 @@
-package com.database;
+package com.sys;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -9,7 +9,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.database.exception.CouponSystemException;
+import com.sys.exception.CouponSystemException;
 
 public class DbExceptionHandler {
 	private static String fileName = "DBExceptionLogger";

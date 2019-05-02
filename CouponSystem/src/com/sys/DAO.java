@@ -1,8 +1,8 @@
-package com.database;
+package com.sys;
 
 import java.util.Collection;
 
-import com.database.exception.CouponSystemException;
+import com.sys.exception.CouponSystemException;
 
 public interface DAO <T>{
 	

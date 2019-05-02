@@ -1,6 +1,6 @@
 //Ok
 
-package com.database;
+package com.sys.beans;
 
 import java.util.ArrayList;
 import java.util.List;

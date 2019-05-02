@@ -1,5 +1,5 @@
 
-package com.database;
+package com.sys;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,8 +10,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.database.exception.ConnectionException;
-import com.database.exception.CustomerException;
+import com.sys.beans.Customer;
+import com.sys.exception.ConnectionException;
+import com.sys.exception.CustomerException;
 
 public class CustomerDBDAO implements UserDAO<Customer> {
 
@@ -21,7 +22,7 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 	private static String sqlRead = "select * from customers where id = ?";
 	private static String sqlUpdate = "update customers set first_name = ? , last_name = ? , password = ? , email = ? WHERE id = ?";
 	private static String sqlDelete = "delete from customers where id = ?";
-
+	private static String sqlDeleteCustomerHistory = "delete from cutomers_v_coupons where customer_id = ?";
 	@Override
 	public boolean exists(String email, String password) throws CustomerException {
 		boolean result = false;
@@ -37,7 +38,7 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 			result = rs.next();
 			disconnect();
 		} catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
+			throw new CustomerException("error in checking if customer exists",e);
 		}
 
 		return result;
@@ -56,7 +57,7 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 
 			disconnect();
 		} catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
+			throw new CustomerException("error in creating customer",e);
 		}
 	}
 
@@ -88,7 +89,7 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 			update.execute();
 			disconnect();
 		} catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
+			throw new CustomerException("error in updating customer",e);
 		}
 
 	}
@@ -96,12 +97,14 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 	@Override
 	public void delete(int id) throws CustomerException{
 		connect();
+		deleteCustomerHistory(id);
+		
 		try(PreparedStatement delete = connection.prepareStatement(sqlDelete)){
 			delete.setInt(1, id);
 			delete.execute();
 			disconnect();
 		} catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
+			throw new CustomerException("error in deleting customer",e);
 		}
 	}
 
@@ -118,7 +121,7 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 			
 			disconnect();
 		} catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
+			throw new CustomerException("error in reading all customers",e);
 		}
 		return result;
 	}
@@ -179,7 +182,7 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 			 }
 			disconnect();
 		} catch (SQLException e) {
-			DbExceptionHandler.HandleException(e);
+			throw new CustomerException("error in getting customer id by email",e);
 		}
 		if(id==-1) {
 			throw new CustomerException("email not found");
@@ -187,4 +190,13 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 		
 		return id;
 	}
-}
+	
+	private void deleteCustomerHistory(int id) throws CustomerException {
+		try (PreparedStatement delete = connection.prepareStatement(sqlDeleteCustomerHistory)) {
+			delete.setInt(1, id);
+			delete.execute();
+	}
+		catch(SQLException e) {
+			throw new CustomerException("error in deleting history", e);
+		}
+}}

@@ -1,4 +1,4 @@
-package com.database;
+package com.sys.beans;
 
 public enum CustomerType {
 ADMIN,

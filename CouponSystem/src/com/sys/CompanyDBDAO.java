@@ -1,5 +1,5 @@
 
-package com.database;
+package com.sys;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,9 +10,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.database.exception.CompanyException;
-import com.database.exception.CouponException;
-import com.database.exception.CouponSystemException;
+import com.sys.beans.Company;
+import com.sys.beans.Coupon;
+import com.sys.exception.CompanyException;
+import com.sys.exception.CouponException;
+import com.sys.exception.CouponSystemException;
 
 public class CompanyDBDAO implements UserDAO<Company> {
 
