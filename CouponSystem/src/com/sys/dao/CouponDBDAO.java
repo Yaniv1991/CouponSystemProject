@@ -1,12 +1,14 @@
-package com.sys;
+package com.sys.dao;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.sys.ConnectionPool;
 import com.sys.beans.Category;
 import com.sys.beans.Company;
 import com.sys.beans.Coupon;
+import com.sys.beans.Customer;
 import com.sys.exception.ConnectionException;
 import com.sys.exception.CouponException;
 
@@ -185,6 +187,26 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 	}
 
 
+	public Collection<Coupon> readAll(Customer customer) throws CouponException{
+		List<Coupon> result = new ArrayList<Coupon>();
+		
+		connect();
+		String sql = "select * from customers_vs_coupons where customer_id = ?";
+		try(PreparedStatement read = connection.prepareStatement(sql)){
+			read.setInt(1, customer.getId());
+			ResultSet rs = read.executeQuery();
+			
+			while(rs.next()) {
+				result.add(readFromActiveConnection(rs.getInt("coupon_id"),rs));
+			}
+		} catch (SQLException e) {
+			throw new CouponException("error in reading all coupons of customer", e);
+		}
+		finally {
+			disconnect();
+		}
+		return result;
+	}
 	private synchronized void connect() throws CouponException {
 		try {
 			connection = ConnectionPool.getInstance().getConnection();

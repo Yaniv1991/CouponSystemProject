@@ -2,8 +2,6 @@ package com.sys.exception;
 
 public class CouponSystemException extends Exception{
 
-	//TODO create Exceptions that extend this one
-	//such as a CouponAlreadyExistsException and so on...
 	
 	/**
 	 * 

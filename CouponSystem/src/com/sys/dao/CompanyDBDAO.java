@@ -1,5 +1,5 @@
 
-package com.sys;
+package com.sys.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.sys.ConnectionPool;
 import com.sys.beans.Company;
 import com.sys.beans.Coupon;
 import com.sys.exception.CompanyException;
-import com.sys.exception.CouponException;
 import com.sys.exception.CouponSystemException;
 
 public class CompanyDBDAO implements UserDAO<Company> {
@@ -41,9 +41,8 @@ public class CompanyDBDAO implements UserDAO<Company> {
 			ResultSet rs = stmt.executeQuery(sql);
 			result = rs.next();
 		} catch (SQLException e) {
-			throw new CompanyException("error in checking existance of company",e);
-		}
-		finally {
+			throw new CompanyException("error in checking existance of company", e);
+		} finally {
 			disconnect();
 		}
 
@@ -61,9 +60,8 @@ public class CompanyDBDAO implements UserDAO<Company> {
 			create.setString(1, company.getPassword());
 			create.execute();
 		} catch (SQLException e) {
-			throw new CompanyException("error in creating company",e,company);
-		}
-		finally {
+			throw new CompanyException("error in creating company", e, company);
+		} finally {
 			disconnect();
 		}
 	}
@@ -72,23 +70,23 @@ public class CompanyDBDAO implements UserDAO<Company> {
 	public Company read(int id) throws CouponSystemException {
 		Company result = null;
 		connect();
-			result = readFromActiveConnection(id);
-			disconnect();
+		result = readFromActiveConnection(id);
+		disconnect();
 		return result;
 	}
 
-	private Company readFromActiveConnection(int id, ResultSet rs) throws  CompanyException {
+	private Company readFromActiveConnection(int id, ResultSet rs) throws CompanyException {
 		Company result;
 		result = new Company(id);
 		try {
-		result.setName(rs.getString("name"));
-		result.setPassword(rs.getString("password"));
-		result.setEmail(rs.getString("email"));
+			result.setName(rs.getString("name"));
+			result.setPassword(rs.getString("password"));
+			result.setEmail(rs.getString("email"));
 			result.setCoupons((List<Coupon>) new CouponDBDAO().readAll());
 		} catch (SQLException e) {
-			throw new CompanyException("error in reading company", e,result);
+			throw new CompanyException("error in reading company", e, result);
 		} catch (CouponSystemException e) {
-			throw new CompanyException("error in reading coupons of company",e,result);
+			throw new CompanyException("error in reading coupons of company", e, result);
 		}
 		return result;
 	}
@@ -99,8 +97,6 @@ public class CompanyDBDAO implements UserDAO<Company> {
 		connect();
 		try (PreparedStatement update = connection.prepareStatement(sqlUpdate)) {
 
-//			Company company = readFromActiveConnection(company.getId());
-
 			update.setString(1, company.getName());
 			update.setString(2, company.getPassword());
 			update.setString(3, company.getEmail());
@@ -108,7 +104,7 @@ public class CompanyDBDAO implements UserDAO<Company> {
 			update.execute();
 			disconnect();
 		} catch (SQLException e) {
-			throw new CompanyException("error in updating company",e,company);
+			throw new CompanyException("error in updating company", e, company);
 		}
 	}
 
@@ -121,7 +117,7 @@ public class CompanyDBDAO implements UserDAO<Company> {
 			delete.execute();
 			disconnect();
 		} catch (SQLException e) {
-			throw new CompanyException("error in deleting company",e);
+			throw new CompanyException("error in deleting company", e);
 		}
 
 	}
@@ -139,7 +135,7 @@ public class CompanyDBDAO implements UserDAO<Company> {
 			}
 			disconnect();
 		} catch (SQLException e) {
-			throw new CompanyException("error in reading all companies",e);
+			throw new CompanyException("error in reading all companies", e);
 		}
 
 		return result;
@@ -168,7 +164,7 @@ public class CompanyDBDAO implements UserDAO<Company> {
 			}
 
 		} catch (SQLException e) {
-			throw new CompanyException("error in reading company",e,result);
+			throw new CompanyException("error in reading company", e, result);
 		}
 		return result;
 	}
@@ -179,17 +175,17 @@ public class CompanyDBDAO implements UserDAO<Company> {
 		try (Statement stmt = connection.createStatement()) {
 			String sql = "select id from companies where email = '" + email + "'";
 			ResultSet rs = stmt.executeQuery(sql);
-			 if(rs.next()) {
-				 id = rs.getInt("id");
-			 }
+			if (rs.next()) {
+				id = rs.getInt("id");
+			}
 			disconnect();
 		} catch (SQLException e) {
-			throw new CompanyException("error in getting company id",e);
+			throw new CompanyException("error in getting company id", e);
 		}
-		if(id==-1) {
+		if (id == -1) {
 			throw new CompanyException("email not found");
 		}
-		
+
 		return id;
 	}
 

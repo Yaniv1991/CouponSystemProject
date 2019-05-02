@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.sys.beans.Coupon;
+import com.sys.dao.CouponDBDAO;
 import com.sys.exception.CouponSystemException;
 
 public class CouponExpirationDailyJob implements Runnable {

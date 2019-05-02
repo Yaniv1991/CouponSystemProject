@@ -5,14 +5,23 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.Calendar;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 
-import com.sys.*;
+import com.sys.ConnectionPool;
+import com.sys.DbExceptionHandler;
+import com.sys.beans.Category;
 import com.sys.beans.Coupon;
+import com.sys.beans.Customer;
+import com.sys.dao.CouponDBDAO;
+import com.sys.dao.CustomerDBDAO;
+import com.sys.exception.ConnectionException;
+import com.sys.exception.CouponException;
 import com.sys.exception.CouponSystemException;
+import com.sys.exception.CustomerException;
 //revised
 public class CustomerFacade extends ClientFacade{
 
@@ -32,7 +41,7 @@ public class CustomerFacade extends ClientFacade{
 		this.password = password;
 	}
 
-	public void purchaseCoupon(int couponId) {
+	public void purchaseCoupon(int couponId) throws ConnectionException {
 
 		Coupon coupon = new Coupon(couponId);
 		Date today = new Date();
@@ -59,7 +68,7 @@ public class CustomerFacade extends ClientFacade{
 					throw new CouponSystemException("You have already purchased this coupon");
 				} else if (coupon.getAmount()==0) {
 					throw new CouponSystemException("Coupon out of stock");
-				} else if (isSameDay(coupon.getEndDate())) {
+				} else if (isToday(coupon.getEndDate())) {
 					throw new CouponSystemException("Coupon expired");
 				} else {
 					try (PreparedStatement purchasedCoupon = connection.prepareStatement("INSET INTO customers_v_coupons (customer_id,coupon_id) VALUE(??)")) {
@@ -69,10 +78,10 @@ public class CustomerFacade extends ClientFacade{
 						coupon.setAmount(coupon.getAmount()-1);
 						coupondao.update(coupon);
 					} catch (SQLException e) {
-						DbExceptionHandler.HandleException(e);
+						throw new CouponSystemException("Coupon expired"); //TODO Revise massage
 					}
 				}} catch (SQLException e) {
-					DbExceptionHandler.HandleException(e);
+					throw new CouponSystemException("Coupon expired"); //TODO Revise massage
 				}
 		} catch (CouponSystemException e) {
 			DbExceptionHandler.HandleException(e);
@@ -82,17 +91,73 @@ public class CustomerFacade extends ClientFacade{
 
 	}
 	
-	private boolean isSameDay (Date couponDate) {
+	public Collection<Coupon> getAllCopouns (int customerId) throws CouponSystemException{
 		
+		Collection<Coupon> coupons = new ArrayList<Coupon>();
+		CouponDBDAO couponDao = new CouponDBDAO();
+		CustomerDBDAO customerDao = new CustomerDBDAO();
+		coupons = couponDao.readAll(customerDao.read(customerId));
+		return coupons;
+	}
+	
+	public Collection<Coupon> getAllCopounsByMaxPrice (int customerId, double maxPrice) throws CouponException {
+		Collection<Coupon> coupons = new ArrayList<Coupon>();
+		Collection<Coupon> temp = new ArrayList<Coupon>();
+		CouponDBDAO couponDao = new CouponDBDAO();
+		CustomerDBDAO customerDao = new CustomerDBDAO();
+		temp = couponDao.readAll();
+		for (Coupon coupon : temp) {
+			if (coupon.getPrice()<=maxPrice) {
+				coupons.add(coupon);
+			}
+		}
+		return coupons;
+	}
+	
+	public Collection<Coupon> getAllCopounsByCategory (int customerId, Category category) throws CustomerException{
 		
-		return false;
+		Collection<Coupon> coupons = new ArrayList<Coupon>();
+		Collection<Coupon> temp = new ArrayList<Coupon>();
+		CouponDBDAO couponDao = new CouponDBDAO();
+		CustomerDBDAO customerDao = new CustomerDBDAO();
+		try {
+			temp = couponDao.readAll(customerDao.read(customerId));
+		} catch (CouponException e) {
+			throw new CustomerException("error in getting all coupons by category",e);
+		}
+		for (Coupon coupon : temp) {
+			if (coupon.getCategory()== category) {
+				coupons.add(coupon);
+			}
+		}
+		return coupons;
+	}
+	
+	public Customer getCustomerDetails (String email) {
+		
+		CustomerDBDAO customerDao = new CustomerDBDAO();
+		Customer result = new Customer();
+		try {
+			result = customerDao.read(customerDao.getIdByEmail(email));
+		} catch (CouponSystemException e) {
+			// TODO Add exception handle
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	private boolean isToday (Date couponDate) {
+		
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy"); 
+		LocalDate today = LocalDate.now(); 
+		return (formatter.format(today)==formatter.format((TemporalAccessor) couponDate));
 	}
 	
 	private synchronized void connect() throws CouponSystemException {
 		connection = ConnectionPool.getInstance().getConnection();
 	}
 
-	private synchronized void disconnect() {
+	private synchronized void disconnect() throws ConnectionException {
 		ConnectionPool.getInstance().restoreConnection(connection);
 		connection = null;
 	}

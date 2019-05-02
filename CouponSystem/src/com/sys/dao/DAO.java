@@ -1,4 +1,4 @@
-package com.sys;
+package com.sys.dao;
 
 import java.util.Collection;
 

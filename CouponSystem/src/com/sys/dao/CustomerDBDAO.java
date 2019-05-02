@@ -1,5 +1,5 @@
 
-package com.sys;
+package com.sys.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.sys.ConnectionPool;
 import com.sys.beans.Customer;
 import com.sys.exception.ConnectionException;
 import com.sys.exception.CustomerException;
@@ -23,6 +24,7 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 	private static String sqlUpdate = "update customers set first_name = ? , last_name = ? , password = ? , email = ? WHERE id = ?";
 	private static String sqlDelete = "delete from customers where id = ?";
 	private static String sqlDeleteCustomerHistory = "delete from cutomers_v_coupons where customer_id = ?";
+	
 	@Override
 	public boolean exists(String email, String password) throws CustomerException {
 		boolean result = false;
@@ -125,6 +127,8 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 		}
 		return result;
 	}
+	
+	
 
 	private synchronized void connect() throws CustomerException {
 		if (connection == null) {

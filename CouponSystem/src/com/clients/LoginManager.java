@@ -1,7 +1,7 @@
 package com.clients;
 
-import com.sys.CompanyDBDAO;
-import com.sys.CustomerDBDAO;
+import com.sys.dao.CompanyDBDAO;
+import com.sys.dao.CustomerDBDAO;
 import com.sys.exception.CouponSystemException;
 
 public class LoginManager {

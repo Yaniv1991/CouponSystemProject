@@ -1,4 +1,4 @@
-package com.sys;
+package com.sys.dao;
 
 import com.sys.exception.CouponSystemException;
 
