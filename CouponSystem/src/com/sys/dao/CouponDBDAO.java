@@ -186,7 +186,6 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		return result;
 	}
 
-
 	public Collection<Coupon> readAll(Customer customer) throws CouponException{
 		List<Coupon> result = new ArrayList<Coupon>();
 		
@@ -207,6 +206,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		}
 		return result;
 	}
+
 	private synchronized void connect() throws CouponException {
 		try {
 			connection = ConnectionPool.getInstance().getConnection();
@@ -246,14 +246,12 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 
 	@Override
 	public void addPurchase(int couponId) throws CouponException {
-		readAndIncrement(couponId,1);
+		readAndIncrement(couponId,-1);
 	}
-
-
 
 	@Override
 	public void deletePurchase(int couponId) throws CouponException {
-		readAndIncrement(couponId, -1);
+		readAndIncrement(couponId, 1);
 		}
 	
 	private void readAndIncrement(int couponId,int increment) throws CouponException {

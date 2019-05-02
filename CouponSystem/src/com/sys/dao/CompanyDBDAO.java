@@ -14,7 +14,8 @@ import com.sys.ConnectionPool;
 import com.sys.beans.Company;
 import com.sys.beans.Coupon;
 import com.sys.exception.CompanyException;
-import com.sys.exception.CouponSystemException;
+import com.sys.exception.CouponException;
+import com.sys.exception.CompanyException;
 
 public class CompanyDBDAO implements UserDAO<Company> {
 
@@ -28,12 +29,12 @@ public class CompanyDBDAO implements UserDAO<Company> {
 	private Connection connection;
 
 	@Override
-	public boolean exists(String email, String password) throws CouponSystemException {
+	public boolean exists(String email, String password) throws CompanyException {
 		boolean result = false;
 		connect();
 
 		if (email.isEmpty() || password.isEmpty()) {
-			throw new CouponSystemException("Password or Email were empty");
+			throw new CompanyException("Password or Email were empty");
 		}
 
 		try (Statement stmt = connection.createStatement()) {
@@ -50,7 +51,7 @@ public class CompanyDBDAO implements UserDAO<Company> {
 	}
 
 	@Override
-	public void create(Company company) throws CouponSystemException {
+	public void create(Company company) throws CompanyException {
 		// "insert into companies (name,email,password) values(?,?,?)"
 		connect();
 		try (PreparedStatement create = connection.prepareStatement(sqlCreate)) {
@@ -67,7 +68,7 @@ public class CompanyDBDAO implements UserDAO<Company> {
 	}
 
 	@Override
-	public Company read(int id) throws CouponSystemException {
+	public Company read(int id) throws CompanyException {
 		Company result = null;
 		connect();
 		result = readFromActiveConnection(id);
@@ -82,17 +83,17 @@ public class CompanyDBDAO implements UserDAO<Company> {
 			result.setName(rs.getString("name"));
 			result.setPassword(rs.getString("password"));
 			result.setEmail(rs.getString("email"));
-			result.setCoupons((List<Coupon>) new CouponDBDAO().readAll());
+			result.setCoupons((List<Coupon>) new CouponDBDAO().readAll(result));
 		} catch (SQLException e) {
 			throw new CompanyException("error in reading company", e, result);
-		} catch (CouponSystemException e) {
+		} catch (CouponException e) {
 			throw new CompanyException("error in reading coupons of company", e, result);
 		}
 		return result;
 	}
 
 	@Override
-	public void update(Company company) throws CouponSystemException {
+	public void update(Company company) throws CompanyException {
 //		"update companies set name = ?,password = ?,email = ? where id = ?"
 		connect();
 		try (PreparedStatement update = connection.prepareStatement(sqlUpdate)) {
@@ -109,7 +110,7 @@ public class CompanyDBDAO implements UserDAO<Company> {
 	}
 
 	@Override
-	public void delete(int id) throws CouponSystemException {
+	public void delete(int id) throws CompanyException {
 		connect();
 		try (PreparedStatement delete = connection.prepareStatement(sqlDelete)) {
 
@@ -123,7 +124,7 @@ public class CompanyDBDAO implements UserDAO<Company> {
 	}
 
 	@Override
-	public Collection<Company> readAll() throws CouponSystemException {
+	public Collection<Company> readAll() throws CompanyException {
 		List<Company> result = new ArrayList<>();
 		connect();
 
@@ -142,13 +143,13 @@ public class CompanyDBDAO implements UserDAO<Company> {
 
 	}
 
-	private synchronized void connect() throws CouponSystemException {
+	private synchronized void connect() throws CompanyException {
 		if (connection == null) {
 			connection = ConnectionPool.getInstance().getConnection();
 		}
 	}
 
-	private synchronized void disconnect() throws CouponSystemException {
+	private synchronized void disconnect() throws CompanyException {
 		ConnectionPool.getInstance().restoreConnection(connection);
 		connection = null;
 	}
@@ -170,7 +171,7 @@ public class CompanyDBDAO implements UserDAO<Company> {
 	}
 
 	@Override
-	public int getIdByEmail(String email) throws CouponSystemException {
+	public int getIdByEmail(String email) throws CompanyException {
 		int id = -1;
 		try (Statement stmt = connection.createStatement()) {
 			String sql = "select id from companies where email = '" + email + "'";

@@ -1,6 +1,5 @@
 package com.clients;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -10,7 +9,9 @@ import com.sys.beans.Customer;
 import com.sys.dao.CompanyDBDAO;
 import com.sys.dao.CouponDBDAO;
 import com.sys.dao.CustomerDBDAO;
-import com.sys.exception.CouponSystemException;
+import com.sys.exception.CompanyException;
+import com.sys.exception.CouponException;
+import com.sys.exception.CustomerException;
 
 public class AdminFacade extends ClientFacade {
 
@@ -19,173 +20,81 @@ public class AdminFacade extends ClientFacade {
 
 		String correctEmail = "admin@admin.com";
 		String correctPassword = "admin";
-		return (email.equals(correctEmail)&& password.equals(correctPassword));
+		return (email.equals(correctEmail) && password.equals(correctPassword));
 	}
 
-	public void addCompany(Company company) {
+	public void addCompany(Company company) throws CompanyException {
 
-		CompanyDBDAO companydao = new CompanyDBDAO();
-		try {
-			Company checkCompany = companydao.read(companydao.getIdByEmail(company.getEmail()));
-			if (company.getEmail() != checkCompany.getEmail() && company.getName() != checkCompany.getName()) {
-				companydao.create(company);
-			} else {
-				throw new CouponSystemException("Company with similar name or email exists");
-			}
-		} catch (CouponSystemException e) {
-			// TODO Add exception handle!
-			e.printStackTrace();
+		CompanyDBDAO companyDao = new CompanyDBDAO();
+		if (companyDao.read(companyDao.getIdByEmail(company.getEmail())) != null) {
+			throw new CompanyException("Company with same email already exists");
 		}
+		List<Company> allCompanies = (List<Company>) companyDao.readAll();
 
-	}
-
-	public void updateCompany(Company company) {
-
-		CompanyDBDAO companydao = new CompanyDBDAO();
-		Company checkCompany = new Company();
-		try {
-			checkCompany = companydao.read(company.getId());
-			if (checkCompany.getId() == company.getId() && checkCompany.getName() == company.getName()) {
-				companydao.update(company);
-			} else {
-				throw new CouponSystemException("Cannot update company name or ID");
+		for (Company companyToCheck : allCompanies) {
+			if (company.getName().equalsIgnoreCase(companyToCheck.getName())) {
+				throw new CompanyException("Company with same name already exists");
 			}
-
-		} catch (CouponSystemException e) {
-			// TODO Add exception handle!
-			e.printStackTrace();
 		}
-
+		companyDao.create(company);
 	}
 
-	public void deleteCompany(Company company) {
+	public void updateCompany(Company company) throws CompanyException {
 
-		CouponDBDAO coupondao = new CouponDBDAO();
-		CompanyDBDAO companydao = new CompanyDBDAO();
-		List<Coupon> coupons = new ArrayList<Coupon>();
+		CompanyDBDAO CompanyDao = new CompanyDBDAO();
+		Company existingCompany = CompanyDao.read(company.getId());
+
+		if (existingCompany.getId() != company.getId()
+				|| !existingCompany.getName().equalsIgnoreCase(company.getName())) {
+			throw new CompanyException("cannot update company id and name");
+		}
+		CompanyDao.update(company);
+	}
+
+	public void deleteCompany(Company company) throws CouponException, CompanyException {
+		CouponDBDAO couponDao = new CouponDBDAO();
+		CompanyDBDAO companyDao = new CompanyDBDAO();
 		for (Coupon coupon : company.getCoupons()) {
-			coupons.add(coupon);
+			couponDao.delete(coupon.getId());
 		}
-		for (Coupon coupon : coupons) {
-			try {
-				coupondao.delete(coupon.getId());
-				coupondao.deleteHistory(coupon.getId());
-			} catch (CouponSystemException e) {
-				// TODO Add exception handle!
-				e.printStackTrace();
-			}
-		}
-		try {
-			companydao.delete(company.getId());
-		} catch (CouponSystemException e) {
-			// TODO Add exception handle!
-			e.printStackTrace();
-		}
-
+		companyDao.delete(company.getId());
 	}
 
-	public Collection<Company> getAllCompanies() {
-
-		CompanyDBDAO companydao = new CompanyDBDAO();
-		Collection<Company> companies = new ArrayList<Company>();
-		try {
-			companies = companydao.readAll();
-		} catch (CouponSystemException e) {
-			// TODO Add exception handle!
-			e.printStackTrace();
-		}
-		return companies;
-
+	public Collection<Company> getAllCompanies() throws CompanyException {
+		return new CompanyDBDAO().readAll();
 	}
 
-	public Company getCompanyById(int companyId) {
-
-		CompanyDBDAO companydao = new CompanyDBDAO();
-		Company result = new Company();
-		try {
-			result = companydao.read(companyId);
-			return result;
-		} catch (CouponSystemException e) {
-			// TODO Add exception handle!
-			e.printStackTrace();
-		}
-		return null;
-
+	public Company getCompanyById(int companyId) throws CompanyException {
+		return new CompanyDBDAO().read(companyId);
 	}
 
-	public void addCustomer(Customer customer) {
-
-		CustomerDBDAO customerdao = new CustomerDBDAO();
-		boolean checkCustomer = false;
-		try {
-			checkCustomer = customerdao.exists(customer.getEmail(), customer.getPassword());
-			if (!checkCustomer) {
-				customerdao.create(customer);
-			} else {
-				throw new CouponSystemException("Customer with a similar email already exists");
-			}
-		} catch (CouponSystemException e) {
-			// TODO Add exception handle!
-			e.printStackTrace();
+	public void addCustomer(Customer customer) throws CustomerException {
+		CustomerDBDAO customerDao = new CustomerDBDAO();
+		if (customerDao.read(customerDao.getIdByEmail(customer.getEmail())) != null) {
+			throw new CustomerException("Customer exists with the same email");
 		}
-
+		customerDao.create(customer);
 	}
 
-	public void updateCustomer(Customer customer) {
-
-		CustomerDBDAO customerdao = new CustomerDBDAO();
-		Customer checkCustomer = new Customer();
-		try {
-			checkCustomer = customerdao.read(customer.getId());
-			if (customer.getId() == checkCustomer.getId()) {
-				customerdao.update(customer);
-			} else {
-				throw new CouponSystemException("Customer ID cannot be updated");
-			}
-		} catch (CouponSystemException e) {
-			// TODO Add exception handle!
-			e.printStackTrace();
+	public void updateCustomer(Customer customer) throws CustomerException {
+		CustomerDBDAO customerDao = new CustomerDBDAO();
+		Customer existingCustomer = customerDao.read(customer.getId());
+		if (customer.getId() != existingCustomer.getId()) {
+			throw new CustomerException("cannot update customer id");
 		}
-
+		customerDao.update(customer);
 	}
 
-	public void removeCustomer(Customer customer) {
-
-		CustomerDBDAO customerdao = new CustomerDBDAO();
-		try {
-			customerdao.delete(customer.getId());
-		} catch (CouponSystemException e) {
-			// TODO Add exception handle!
-			e.printStackTrace();
-		}
+	public void removeCustomer(Customer customer) throws CustomerException {
+		new CustomerDBDAO().delete(customer.getId());
 	}
 
-	public Collection<Customer> getAllCustomers() {
-
-		CustomerDBDAO customerdao = new CustomerDBDAO();
-		Collection<Customer> customers = new ArrayList<>();
-		try {
-			customers = customerdao.readAll();
-		} catch (CouponSystemException e) {
-			// TODO Add exception handle!
-			e.printStackTrace();
-		}
-		return customers;
-
+	public Collection<Customer> getAllCustomers() throws CustomerException {
+		return new CustomerDBDAO().readAll();
 	}
 
-	public Customer returnCustomerById(int customerId) {
-
-		Customer customer = new Customer();
-		CustomerDBDAO customerdao = new CustomerDBDAO();
-		try {
-			customer = customerdao.read(customerId);
-		} catch (CouponSystemException e) {
-			// TODO Add exception handle!
-			e.printStackTrace();
-		}
-		return customer;
-
+	public Customer returnCustomerById(int customerId) throws CustomerException {
+		return new CustomerDBDAO().read(customerId);
 	}
 
 }

@@ -24,23 +24,25 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 	private static String sqlUpdate = "update customers set first_name = ? , last_name = ? , password = ? , email = ? WHERE id = ?";
 	private static String sqlDelete = "delete from customers where id = ?";
 	private static String sqlDeleteCustomerHistory = "delete from cutomers_v_coupons where customer_id = ?";
-	
+
 	@Override
 	public boolean exists(String email, String password) throws CustomerException {
 		boolean result = false;
 		connect();
 //		String email = arguments[0];
 //		String password = arguments[1];
-		if(email.isEmpty() || password.isEmpty()) {
+		if (email.isEmpty() || password.isEmpty()) {
 			throw new CustomerException("Password or Email were empty");
 		}
 		try (Statement stmt = connection.createStatement()) {
 			String sql = "select * from customers where email = '" + email + "'" + " , password = '" + password + "'";
 			ResultSet rs = stmt.executeQuery(sql);
 			result = rs.next();
-			disconnect();
 		} catch (SQLException e) {
-			throw new CustomerException("error in checking if customer exists",e);
+			throw new CustomerException("error in checking if customer exists", e);
+		}
+		finally {
+			disconnect();
 		}
 
 		return result;
@@ -56,10 +58,10 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 			create.setString(3, customer.getPassword());
 			create.setString(4, customer.getEmail());
 			create.execute();
-
-			disconnect();
 		} catch (SQLException e) {
-			throw new CustomerException("error in creating customer",e);
+			throw new CustomerException("error in creating customer", e);
+		} finally {
+			disconnect();
 		}
 	}
 
@@ -67,17 +69,17 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 	public Customer read(int id) throws CustomerException {
 		// "select * from customers where id = ?"
 		Customer result = null;
-		connect();
+		try {
+			connect();
 			result = readFromConnection(id);
-			disconnect(); 
+		} finally {
+			disconnect();
+		}
 		return result;
 	}
 
-
-
-
 	@Override
-	public void update(Customer customer) throws CustomerException{
+	public void update(Customer customer) throws CustomerException {
 		// "update customers set first_name = ?
 		// , last_name = ? , password = ? , email = ? WHERE id = ?"
 		connect();
@@ -89,53 +91,55 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 			update.setString(4, customer.getEmail());
 			update.setInt(5, customer.getId());
 			update.execute();
-			disconnect();
 		} catch (SQLException e) {
-			throw new CustomerException("error in updating customer",e);
+			throw new CustomerException("error in updating customer", e);
+		}
+		finally {
+			disconnect();
 		}
 
 	}
 
 	@Override
-	public void delete(int id) throws CustomerException{
+	public void delete(int id) throws CustomerException {
 		connect();
 		deleteCustomerHistory(id);
-		
-		try(PreparedStatement delete = connection.prepareStatement(sqlDelete)){
+
+		try (PreparedStatement delete = connection.prepareStatement(sqlDelete)) {
 			delete.setInt(1, id);
 			delete.execute();
-			disconnect();
 		} catch (SQLException e) {
-			throw new CustomerException("error in deleting customer",e);
+			throw new CustomerException("error in deleting customer", e);
+		} finally {
+			disconnect();
 		}
 	}
 
 	@Override
-	public Collection<Customer> readAll() throws CustomerException{
+	public Collection<Customer> readAll() throws CustomerException {
 		List<Customer> result = new ArrayList<>();
 		connect();
 		String sqlReadAll = "select * from customers";
-		try(Statement readAll = connection.createStatement()){
+		try (Statement readAll = connection.createStatement()) {
 			ResultSet rs = readAll.executeQuery(sqlReadAll);
-			while(rs.next()) {
+			while (rs.next()) {
 				result.add(createCustomer(rs.getInt("id"), rs));
 			}
-			
-			disconnect();
+
 		} catch (SQLException e) {
-			throw new CustomerException("error in reading all customers",e);
+			throw new CustomerException("error in reading all customers", e);
+		} finally {
+			disconnect();
 		}
 		return result;
 	}
-	
-	
 
 	private synchronized void connect() throws CustomerException {
 		if (connection == null) {
 			try {
 				connection = ConnectionPool.getInstance().getConnection();
 			} catch (ConnectionException e) {
-				throw new CustomerException("error in connecting",e);
+				throw new CustomerException("error in connecting", e);
 			}
 		}
 	}
@@ -144,11 +148,11 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 		try {
 			ConnectionPool.getInstance().restoreConnection(connection);
 		} catch (ConnectionException e) {
-			throw new CustomerException("error in disconnecting",e);
+			throw new CustomerException("error in disconnecting", e);
 		}
 		connection = null;
 	}
-	
+
 	private Customer readFromConnection(int id) throws CustomerException {
 		Customer result = null;
 		try (PreparedStatement read = connection.prepareStatement(sqlRead)) {
@@ -164,7 +168,6 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 		return result;
 	}
 
-	
 	private Customer createCustomer(int id, ResultSet rs) throws SQLException {
 		Customer result;
 		result = new Customer(id);
@@ -181,26 +184,27 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 		try (Statement stmt = connection.createStatement()) {
 			String sql = "select * from customers where email = '" + email + "'";
 			ResultSet rs = stmt.executeQuery(sql);
-			 if(rs.next()) {
-				 id = rs.getInt("id");
-			 }
-			disconnect();
+			if (rs.next()) {
+				id = rs.getInt("id");
+			}
 		} catch (SQLException e) {
-			throw new CustomerException("error in getting customer id by email",e);
+			throw new CustomerException("error in getting customer id by email", e);
+		} finally {
+			disconnect();
 		}
-		if(id==-1) {
+		if (id == -1) {
 			throw new CustomerException("email not found");
 		}
-		
+
 		return id;
 	}
-	
+
 	private void deleteCustomerHistory(int id) throws CustomerException {
 		try (PreparedStatement delete = connection.prepareStatement(sqlDeleteCustomerHistory)) {
 			delete.setInt(1, id);
 			delete.execute();
-	}
-		catch(SQLException e) {
+		} catch (SQLException e) {
 			throw new CustomerException("error in deleting history", e);
 		}
-}}
+	}
+}
