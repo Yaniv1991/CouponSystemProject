@@ -31,7 +31,8 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 	private static String sqlDelete = "delete from coupons where id = ?";
 	
 	private static String sqlDeleteHistory = "delete from cutomers_v_coupons where coupon_id = ?";
-	
+	private static String sqlDeleteCustomerHistory = "delete from cutomers_v_coupons where customer_id = ?";
+
 	
 	private Connection connection;
 
@@ -137,7 +138,6 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 	@Override
 	public void delete(int id) throws CouponException {
 		connect();
-		deleteHistory(id);
 		try (PreparedStatement delete = connection.prepareStatement(sqlDelete)) {
 			delete.setInt(1, id);
 			delete.execute();
@@ -260,12 +260,24 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		update(coupon);
 	}
 	
-	public void deleteHistory(int id) throws CouponException {
+	@Override
+	public void deleteAllFromHistory(int couponId) throws CouponException {
 		try (PreparedStatement delete = connection.prepareStatement(sqlDeleteHistory)) {
-			delete.setInt(1, id);
+			delete.setInt(1, couponId);
 			delete.execute();
 		} catch (SQLException e) {
-			throw new CouponException("error in deleting purchase history", e);
+			throw new CouponException("error in deleting purchase history of coupons", e);
 		}
+	}
+	
+	//TODO remove purchases from the coupons so another can buy them
+	public void deleteCouponsOfCustomer(int customerId) 
+			throws CouponException{
+		try (PreparedStatement delete = connection.prepareStatement(sqlDeleteCustomerHistory)) {
+		delete.setInt(1, customerId);
+		delete.execute();
+	} catch (SQLException e) {
+		throw new CouponException("error in deleting history of customer", e);
+	}
 	}
 }

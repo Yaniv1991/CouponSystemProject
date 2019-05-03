@@ -14,6 +14,16 @@ import com.sys.exception.CouponException;
 import com.sys.exception.CustomerException;
 
 public class AdminFacade extends ClientFacade {
+private CustomerDBDAO customerDao;
+private CompanyDBDAO companyDao;
+private CouponDBDAO couponDao;
+
+	
+	public AdminFacade(CustomerDBDAO customerDao, CompanyDBDAO companyDao, CouponDBDAO couponDao) {
+	this.customerDao = customerDao;
+	this.companyDao = companyDao;
+	this.couponDao = couponDao;
+}
 
 	@Override
 	boolean login(String email, String password) {
@@ -24,8 +34,6 @@ public class AdminFacade extends ClientFacade {
 	}
 
 	public void addCompany(Company company) throws CompanyException {
-
-		CompanyDBDAO companyDao = new CompanyDBDAO();
 		if (companyDao.read(companyDao.getIdByEmail(company.getEmail())) != null) {
 			throw new CompanyException("Company with same email already exists");
 		}
@@ -40,20 +48,16 @@ public class AdminFacade extends ClientFacade {
 	}
 
 	public void updateCompany(Company company) throws CompanyException {
-
-		CompanyDBDAO CompanyDao = new CompanyDBDAO();
-		Company existingCompany = CompanyDao.read(company.getId());
+		Company existingCompany = companyDao.read(company.getId());
 
 		if (existingCompany.getId() != company.getId()
 				|| !existingCompany.getName().equalsIgnoreCase(company.getName())) {
 			throw new CompanyException("cannot update company id and name");
 		}
-		CompanyDao.update(company);
+		companyDao.update(company);
 	}
 
 	public void deleteCompany(Company company) throws CouponException, CompanyException {
-		CouponDBDAO couponDao = new CouponDBDAO();
-		CompanyDBDAO companyDao = new CompanyDBDAO();
 		for (Coupon coupon : company.getCoupons()) {
 			couponDao.delete(coupon.getId());
 		}
@@ -61,15 +65,14 @@ public class AdminFacade extends ClientFacade {
 	}
 
 	public Collection<Company> getAllCompanies() throws CompanyException {
-		return new CompanyDBDAO().readAll();
+		return companyDao.readAll();
 	}
 
 	public Company getCompanyById(int companyId) throws CompanyException {
-		return new CompanyDBDAO().read(companyId);
+		return companyDao.read(companyId);
 	}
 
 	public void addCustomer(Customer customer) throws CustomerException {
-		CustomerDBDAO customerDao = new CustomerDBDAO();
 		if (customerDao.read(customerDao.getIdByEmail(customer.getEmail())) != null) {
 			throw new CustomerException("Customer exists with the same email");
 		}
@@ -77,7 +80,6 @@ public class AdminFacade extends ClientFacade {
 	}
 
 	public void updateCustomer(Customer customer) throws CustomerException {
-		CustomerDBDAO customerDao = new CustomerDBDAO();
 		Customer existingCustomer = customerDao.read(customer.getId());
 		if (customer.getId() != existingCustomer.getId()) {
 			throw new CustomerException("cannot update customer id");
@@ -86,15 +88,21 @@ public class AdminFacade extends ClientFacade {
 	}
 
 	public void removeCustomer(Customer customer) throws CustomerException {
-		new CustomerDBDAO().delete(customer.getId());
+		try {
+			couponDao.deleteCouponsOfCustomer(customer.getId());
+		} catch (CouponException e) {
+			throw new CustomerException("error in deleting all coupons of customer",e);
+		}
+		
+		customerDao.delete(customer.getId());
 	}
 
 	public Collection<Customer> getAllCustomers() throws CustomerException {
-		return new CustomerDBDAO().readAll();
+		return customerDao.readAll();
 	}
 
 	public Customer returnCustomerById(int customerId) throws CustomerException {
-		return new CustomerDBDAO().read(customerId);
+		return customerDao.read(customerId);
 	}
 
 }

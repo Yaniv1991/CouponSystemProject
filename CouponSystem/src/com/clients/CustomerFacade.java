@@ -19,21 +19,24 @@ import com.sys.exception.CustomerException;
 //revised
 public class CustomerFacade extends ClientFacade {
 
-	private int id;
+	private Customer customer;
+	private CouponDBDAO couponDao;
+	private CustomerDBDAO customerDao;
 
-	public CustomerFacade(int id) {
-		this.id = id;
+	public CustomerFacade(int id,CouponDBDAO couponDao,CustomerDBDAO customerDao) {
+		customer = new Customer(id);
+		this.couponDao=couponDao;
+		this.customerDao=customerDao;
 	}
 
 	@Override
 	boolean login(String email, String password) throws CustomerException {
-		return (new CustomerDBDAO().exists(email, password));
+		return (customerDao.exists(email, password));
 	}
 
 	public void purchaseCoupon(int couponId) throws CouponException {
-		CouponDBDAO couponDao = new CouponDBDAO();
 		Coupon coupon = couponDao.read(couponId);
-		if (couponDao.exists(id, coupon.getId())) {
+		if (couponDao.exists(customer.getId(), coupon.getId())) {
 			throw new CouponException("Customer already purchased this coupon");
 		}
 		if (coupon.getAmount() == 0) {
@@ -46,15 +49,14 @@ public class CustomerFacade extends ClientFacade {
 	}
 
 	public Collection<Coupon> getAllCopouns(int customerId) throws CouponSystemException {
-		CouponDBDAO couponDao = new CouponDBDAO();
-		return couponDao.readAll(new Customer(id));
+		return couponDao.readAll(customer);
 	}
 
 	public Collection<Coupon> getAllCopounsByMaxPrice(double maxPrice) throws CouponException {
 		Collection<Coupon> coupons = new ArrayList<Coupon>();
 		Collection<Coupon> allCoupons = new ArrayList<Coupon>();
-		CouponDBDAO couponDao = new CouponDBDAO();
-		allCoupons = couponDao.readAll(new Customer(id));
+		
+		allCoupons = couponDao.readAll(customer);
 		for (Coupon coupon : allCoupons) {
 			if (coupon.getPrice() <= maxPrice) {
 				coupons.add(coupon);
@@ -67,10 +69,8 @@ public class CustomerFacade extends ClientFacade {
 
 		Collection<Coupon> coupons = new ArrayList<Coupon>();
 		Collection<Coupon> allCoupons = new ArrayList<Coupon>();
-		CouponDBDAO couponDao = new CouponDBDAO();
-		CustomerDBDAO customerDao = new CustomerDBDAO();
 		try {
-			allCoupons = couponDao.readAll(customerDao.read(id));
+			allCoupons = couponDao.readAll(customer);
 			for (Coupon coupon : allCoupons) {
 				if (coupon.getCategory().equals(category)) {
 					coupons.add(coupon);
@@ -83,7 +83,6 @@ public class CustomerFacade extends ClientFacade {
 	}
 
 	public Customer getCustomerDetails(String email) throws CustomerException {
-		CustomerDBDAO customerDao = new CustomerDBDAO();
 			return customerDao.read(customerDao.getIdByEmail(email));
 	}
 

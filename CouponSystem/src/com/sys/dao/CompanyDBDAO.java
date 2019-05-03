@@ -14,8 +14,8 @@ import com.sys.ConnectionPool;
 import com.sys.beans.Company;
 import com.sys.beans.Coupon;
 import com.sys.exception.CompanyException;
+import com.sys.exception.ConnectionException;
 import com.sys.exception.CouponException;
-import com.sys.exception.CompanyException;
 
 public class CompanyDBDAO implements UserDAO<Company> {
 
@@ -103,10 +103,10 @@ public class CompanyDBDAO implements UserDAO<Company> {
 			update.setString(3, company.getEmail());
 			update.setInt(4, company.getId());
 			update.execute();
-			disconnect();
 		} catch (SQLException e) {
 			throw new CompanyException("error in updating company", e, company);
 		}
+		finally {disconnect();}
 	}
 
 	@Override
@@ -116,10 +116,10 @@ public class CompanyDBDAO implements UserDAO<Company> {
 
 			delete.setInt(1, id);
 			delete.execute();
-			disconnect();
 		} catch (SQLException e) {
 			throw new CompanyException("error in deleting company", e);
 		}
+		finally {disconnect();}
 
 	}
 
@@ -134,23 +134,30 @@ public class CompanyDBDAO implements UserDAO<Company> {
 			while (rs.next()) {
 				result.add(readFromActiveConnection(rs.getInt("id"), rs));
 			}
-			disconnect();
 		} catch (SQLException e) {
 			throw new CompanyException("error in reading all companies", e);
 		}
-
+		finally {disconnect();}
 		return result;
 
 	}
 
 	private synchronized void connect() throws CompanyException {
 		if (connection == null) {
-			connection = ConnectionPool.getInstance().getConnection();
+			try {
+				connection = ConnectionPool.getInstance().getConnection();
+			} catch (ConnectionException e) {
+				throw new CompanyException("error in connection",e);
+			}
 		}
 	}
 
 	private synchronized void disconnect() throws CompanyException {
-		ConnectionPool.getInstance().restoreConnection(connection);
+		try {
+			ConnectionPool.getInstance().restoreConnection(connection);
+		} catch (ConnectionException e) {
+			throw new CompanyException("error in restoring connection",e);
+		}
 		connection = null;
 	}
 

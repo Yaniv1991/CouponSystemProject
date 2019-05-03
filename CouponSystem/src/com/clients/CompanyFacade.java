@@ -12,22 +12,24 @@ import com.sys.exception.CouponSystemException;
 
 public class CompanyFacade extends ClientFacade{
 
-	private int id;
-	
-	public CompanyFacade(int id) {
+	private Company company;
+	private CompanyDBDAO companyDao;
+	private CouponDBDAO couponDao;
+	public CompanyFacade(int id,CompanyDBDAO companyDao,CouponDBDAO couponDao) {
 		super();
-		this.id = id;
+		company = new Company(id);
+		this.companyDao=companyDao;
+		this.couponDao = couponDao;
 	}
 
 	@Override
 	public boolean login(String email, String password) throws CouponSystemException {
-			return new CompanyDBDAO().exists(email, password);	
+			return companyDao.exists(email, password);	
 	}
 	
 	public void addCoupon(Coupon coupon) throws CouponException {
 		
-		CouponDBDAO couponDao = new CouponDBDAO();
-		List<Coupon> allCoupons = (List<Coupon>) couponDao.readAll(new Company(id));
+		List<Coupon> allCoupons = (List<Coupon>) couponDao.readAll(company);
 		//TODO maybe change to a Map<String,Coupon>....
 		for (Coupon couponFromList : allCoupons) {
 			if(couponFromList.getTitle().equalsIgnoreCase(coupon.getTitle())) {
@@ -38,7 +40,6 @@ public class CompanyFacade extends ClientFacade{
 	}
 	
 	public void updateCoupon (Coupon coupon) throws CouponException {
-		CouponDBDAO couponDao = new CouponDBDAO();
 		Coupon existingCoupon = couponDao.read(coupon.getId());
 				
 		if (existingCoupon.getCompanyId() != coupon.getCompanyId() 
@@ -50,18 +51,16 @@ public class CompanyFacade extends ClientFacade{
 	}
 	
 	public void RemoveCoupon (Coupon coupon) throws CouponException {
-		CouponDBDAO coupondao = new CouponDBDAO();
-			coupondao.delete(coupon.getId());
+			couponDao.delete(coupon.getId());
 	}
 	
 	public List<Coupon> returnAllCoupons () throws CouponException {
-		return (List<Coupon>) new CouponDBDAO().readAll(new Company(id));
+		return (List<Coupon>)couponDao.readAll(company);
 	}
 	
 	public List<Coupon> returnAllCouponsByCategory (Category category) throws CouponException {
-		CouponDBDAO couponDao = new CouponDBDAO();
 		List<Coupon> coupons = new ArrayList<>();
-		List<Coupon> allCoupons = (List<Coupon>) couponDao.readAll(new Company(id));
+		List<Coupon> allCoupons = (List<Coupon>) couponDao.readAll(company);
 		for (Coupon coupon : allCoupons) {
 			if(coupon.getCategory().equals(category)) {
 				coupons.add(coupon);
@@ -71,9 +70,8 @@ public class CompanyFacade extends ClientFacade{
 	}
 
 	public List<Coupon> returnAllCouponsByMaxPrice (double maxPrice) throws CouponException {
-		CouponDBDAO couponDao = new CouponDBDAO();
 		List<Coupon> coupons = new ArrayList<>();
-		List<Coupon> allCoupons = (List<Coupon>) couponDao.readAll(new Company(id));
+		List<Coupon> allCoupons = (List<Coupon>) couponDao.readAll(company);
 		for (Coupon coupon : allCoupons) {
 			if(coupon.getPrice()<=maxPrice) {
 				coupons.add(coupon);
@@ -83,7 +81,7 @@ public class CompanyFacade extends ClientFacade{
 	}
 	
 	public Company getCompanyDetails () throws CouponSystemException {
-		return new CompanyDBDAO().read(id);
+		return companyDao.read(company.getId());
 	}
  
 }

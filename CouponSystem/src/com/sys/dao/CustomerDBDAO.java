@@ -23,14 +23,11 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 	private static String sqlRead = "select * from customers where id = ?";
 	private static String sqlUpdate = "update customers set first_name = ? , last_name = ? , password = ? , email = ? WHERE id = ?";
 	private static String sqlDelete = "delete from customers where id = ?";
-	private static String sqlDeleteCustomerHistory = "delete from cutomers_v_coupons where customer_id = ?";
-
+	
 	@Override
 	public boolean exists(String email, String password) throws CustomerException {
 		boolean result = false;
 		connect();
-//		String email = arguments[0];
-//		String password = arguments[1];
 		if (email.isEmpty() || password.isEmpty()) {
 			throw new CustomerException("Password or Email were empty");
 		}
@@ -103,7 +100,7 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 	@Override
 	public void delete(int id) throws CustomerException {
 		connect();
-		deleteCustomerHistory(id);
+//		deleteCustomerHistory(id);
 
 		try (PreparedStatement delete = connection.prepareStatement(sqlDelete)) {
 			delete.setInt(1, id);
@@ -197,14 +194,5 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 		}
 
 		return id;
-	}
-
-	private void deleteCustomerHistory(int id) throws CustomerException {
-		try (PreparedStatement delete = connection.prepareStatement(sqlDeleteCustomerHistory)) {
-			delete.setInt(1, id);
-			delete.execute();
-		} catch (SQLException e) {
-			throw new CustomerException("error in deleting history", e);
-		}
 	}
 }
