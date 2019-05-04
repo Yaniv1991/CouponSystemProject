@@ -1,4 +1,4 @@
-package com.sys;
+package com.database.utils;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -9,7 +9,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.sys.exception.CouponSystemException;
 
 public class DbExceptionHandler {
 	private static String fileName = "DBExceptionLogger";
@@ -19,13 +18,10 @@ public class DbExceptionHandler {
 
 	public static void HandleException(Exception e)  {
 		logToFile(e);
-	String message = null;
 		if (e instanceof SQLException) {
 //			System.out.println("SQL Exception. Inaal Rabak");
-			message = "SQL exception";
 		}
 		if (e instanceof InterruptedException) {
-			message = "Interruped by " + e.getClass();
 		}
 		if(e instanceof ParseException) {
 			

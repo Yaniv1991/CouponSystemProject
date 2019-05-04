@@ -6,7 +6,7 @@ import java.sql.Connection;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.sys.ConnectionPool;
+import com.sys.connection.ConnectionPool;
 import com.sys.exception.ConnectionException;
 import com.sys.exception.CouponSystemException;
 
@@ -63,8 +63,9 @@ static long sleepTime = 200;
 	public static void main(String[] args) {
 		Thread t1 = new Thread(getConnections);
 		Thread t2 = new Thread(restoreConnections);
+	
 		try {
-			t1.run();
+			t1.start();
 			Thread.sleep(sleepTime);
 			t2.start();
 		} catch (InterruptedException e) {

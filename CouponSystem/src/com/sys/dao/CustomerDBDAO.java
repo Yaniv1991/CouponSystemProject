@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.sys.ConnectionPool;
 import com.sys.beans.Customer;
+import com.sys.connection.ConnectionPool;
 import com.sys.exception.ConnectionException;
 import com.sys.exception.CustomerException;
 

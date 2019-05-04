@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.sys.ConnectionPool;
 import com.sys.beans.Company;
 import com.sys.beans.Coupon;
+import com.sys.connection.ConnectionPool;
 import com.sys.exception.CompanyException;
 import com.sys.exception.ConnectionException;
 import com.sys.exception.CouponException;

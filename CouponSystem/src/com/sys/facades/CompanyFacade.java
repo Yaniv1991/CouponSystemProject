@@ -1,4 +1,4 @@
-package com.clients;
+package com.sys.facades;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +46,6 @@ public class CompanyFacade extends ClientFacade{
 				|| existingCoupon.getId() != coupon.getId()) {
 			throw new CouponException("cannot update coupon id and company id");
 		}
-		
 		couponDao.update(coupon);
 	}
 	

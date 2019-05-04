@@ -1,4 +1,4 @@
-package com.sys;
+package com.sys.connection;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
+import com.database.utils.DbExceptionHandler;
 import com.sys.beans.Coupon;
 import com.sys.dao.CouponDBDAO;
 import com.sys.exception.CouponSystemException;
