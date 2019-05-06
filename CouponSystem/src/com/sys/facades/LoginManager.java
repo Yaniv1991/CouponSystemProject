@@ -18,7 +18,6 @@ public class LoginManager {
 	}
 
 	private LoginManager() {
-		// TODO Auto-generated constructor stub
 		couponDao = new CouponDBDAO();
 		companyDao = new CompanyDBDAO(couponDao);
 		customerDao = new CustomerDBDAO(couponDao);
