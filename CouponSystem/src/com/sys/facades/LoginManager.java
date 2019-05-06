@@ -20,8 +20,8 @@ public class LoginManager {
 	private LoginManager() {
 		// TODO Auto-generated constructor stub
 		couponDao = new CouponDBDAO();
-		companyDao = new CompanyDBDAO();
-		customerDao = new CustomerDBDAO();
+		companyDao = new CompanyDBDAO(couponDao);
+		customerDao = new CustomerDBDAO(couponDao);
 	}
 
 	public ClientFacade login(String email, String password) throws CouponSystemException {

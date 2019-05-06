@@ -10,9 +10,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.sys.beans.Coupon;
 import com.sys.beans.Customer;
 import com.sys.connection.ConnectionPool;
 import com.sys.exception.ConnectionException;
+import com.sys.exception.CouponException;
 import com.sys.exception.CustomerException;
 
 public class CustomerDBDAO implements UserDAO<Customer> {
@@ -24,6 +26,15 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 	private static String sqlUpdate = "update customers set first_name = ? , last_name = ? , password = ? , email = ? WHERE id = ?";
 	private static String sqlDelete = "delete from customers where id = ?";
 	
+	private CouponDBDAO couponDao;
+	
+	
+	
+	public CustomerDBDAO(CouponDBDAO couponDao) {
+		super();
+		this.couponDao = couponDao;
+	}
+
 	@Override
 	public boolean exists(String email, String password) throws CustomerException {
 		boolean result = false;
@@ -165,13 +176,18 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 		return result;
 	}
 
-	private Customer createCustomer(int id, ResultSet rs) throws SQLException {
+	private Customer createCustomer(int id, ResultSet rs) throws CustomerException {
 		Customer result;
 		result = new Customer(id);
-		result.setFirstName(rs.getString("first_name"));
+		try {
+			result.setFirstName(rs.getString("first_name"));
 		result.setLastName(rs.getString("last_name"));
 		result.setEmail(rs.getString("email"));
 		result.setPassword(rs.getString("password"));
+		result.setCoupons((List<Coupon>) couponDao.readAll(result));
+		} catch (SQLException | CouponException e) {
+			throw new CustomerException("error in reading customer",e);
+		}
 		return result;
 	}
 

@@ -26,6 +26,12 @@ public class CompanyDBDAO implements UserDAO<Company> {
 	private static String sqlUpdate = "update companies set name = ?,password = ?,email = ? where id = ?";
 	private static String sqlDelete = "delete * from companies where id = ?";
 
+	private CouponDBDAO couponDao;
+	public CompanyDBDAO(CouponDBDAO couponDao) {
+		super();
+		this.couponDao = couponDao;
+	}
+
 	private Connection connection;
 
 	@Override
@@ -83,7 +89,7 @@ public class CompanyDBDAO implements UserDAO<Company> {
 			result.setName(rs.getString("name"));
 			result.setPassword(rs.getString("password"));
 			result.setEmail(rs.getString("email"));
-			result.setCoupons((List<Coupon>) new CouponDBDAO().readAll(result));
+			result.setCoupons((List<Coupon>) couponDao.readAll(result));
 		} catch (SQLException e) {
 			throw new CompanyException("error in reading company", e, result);
 		} catch (CouponException e) {
