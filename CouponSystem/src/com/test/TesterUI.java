@@ -1,7 +1,10 @@
 package com.test;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
@@ -9,6 +12,7 @@ import com.sys.beans.Category;
 import com.sys.beans.Company;
 import com.sys.beans.Coupon;
 import com.sys.beans.Customer;
+import com.sys.connection.CouponExpirationDailyJob;
 import com.sys.exception.CouponSystemException;
 import com.sys.facades.AdminFacade;
 import com.sys.facades.ClientFacade;
@@ -18,19 +22,18 @@ import com.sys.facades.LoginManager;
 
 public class TesterUI {
 	private Scanner in = new Scanner(System.in);
+	private CouponExpirationDailyJob dailyJob;
 
 	private ClientFacade facade;
 	private boolean quit = false;
 	private boolean hasStarted = false;
-
-	private List<Action> actions = new ArrayList<>();
 
 	public void startUI() {
 
 		while (!quit) {
 			try {
 				showMenu();
-				
+
 			} catch (CouponSystemException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -67,11 +70,11 @@ public class TesterUI {
 				exit();
 				break;
 			}
-			
+
 			}
 
 			if (facade instanceof AdminFacade) {
-				AdminFacade facade = (AdminFacade)this.facade;
+				AdminFacade facade = (AdminFacade) this.facade;
 				/// ....Lots of options
 				switch (command) {
 				case "add company": {
@@ -79,7 +82,7 @@ public class TesterUI {
 					break;
 				}
 				case "remove company": {
-					facade.deleteCompany(new Company(readById("company")));
+					facade.deleteCompany(new Company(readInteger("company")));
 					break;
 				}
 				case "read all companies": {
@@ -89,7 +92,7 @@ public class TesterUI {
 				case "update company": {
 					List<Company> companies = (List<Company>) facade.getAllCompanies();
 					readList(companies);
-					Company companyToUpdate = facade.getCompanyById(readById("company"));
+					Company companyToUpdate = facade.getCompanyById(readInteger("company"));
 					updateCompany(companyToUpdate);
 					facade.updateCompany(companyToUpdate);
 					break;
@@ -100,7 +103,7 @@ public class TesterUI {
 					break;
 				}
 				case "remove customer": {
-					facade.removeCustomer(new Customer(readById("customer")));
+					facade.removeCustomer(new Customer(readInteger("customer")));
 					break;
 				}
 				case "read all customers": {
@@ -110,7 +113,7 @@ public class TesterUI {
 				case "update customer": {
 					List<Customer> customers = (List<Customer>) facade.getAllCustomers();
 					readList(customers);
-					Customer customerToUpdate = facade.returnCustomerById(readById("customer"));
+					Customer customerToUpdate = facade.returnCustomerById(readInteger("customer"));
 					updateCustomer(customerToUpdate);
 					facade.updateCustomer(customerToUpdate);
 					break;
@@ -122,14 +125,14 @@ public class TesterUI {
 			}
 
 			else if (facade instanceof CustomerFacade) {
-				CustomerFacade facade = (CustomerFacade)this.facade;
+				CustomerFacade facade = (CustomerFacade) this.facade;
 				switch (command) {
 				case "purchase coupon": {
 					facade.purchaseCoupon(selectFromList((List<Coupon>) facade.getAllCopouns()));
 					break;
 				}
 				case "cancel purchase": {
-					///...TODO ....
+					/// ...TODO ....
 					break;
 				}
 				case "read all purchased coupons": {
@@ -155,7 +158,7 @@ public class TesterUI {
 				}
 
 			} else if (facade instanceof CompanyFacade) {
-				CompanyFacade facade = (CompanyFacade)this.facade;
+				CompanyFacade facade = (CompanyFacade) this.facade;
 				switch (command) {
 				case "add coupon": {
 					facade.addCoupon(createCoupon());
@@ -163,12 +166,12 @@ public class TesterUI {
 				}
 				case "delete coupon": {
 					// TODO ....
-					
+
 					break;
 				}
 				case "update coupon": {
-					
-					Coupon couponToUpdate = facade.read(readById("coupon id"));
+
+					Coupon couponToUpdate = facade.read(readInteger("coupon id"));
 					updateCoupon(couponToUpdate);
 					facade.updateCoupon(couponToUpdate);
 					break;
@@ -186,7 +189,8 @@ public class TesterUI {
 					break;
 				}
 				case "get company details": {
-					System.out.println(facade.getCompanyDetails());;
+					System.out.println(facade.getCompanyDetails());
+					;
 					break;
 				}
 				default: {
@@ -200,93 +204,199 @@ public class TesterUI {
 
 	private void updateCoupon(Coupon couponToUpdate) {
 		// TODO Auto-generated method stub
-		
+		Coupon updatedCoupon = createCoupon();
+		couponToUpdate.setAmount(updatedCoupon.getAmount());
+		couponToUpdate.setTitle(updatedCoupon.getTitle());
+		couponToUpdate.setMessage(updatedCoupon.getMessage());
+		couponToUpdate.setCategory(updatedCoupon.getCategory());
+		couponToUpdate.setPrice(updatedCoupon.getPrice());
+		couponToUpdate.setStartDate(updatedCoupon.getStartDate());
+		couponToUpdate.setEndDate(updatedCoupon.getEndDate());
+		couponToUpdate.setImage(updatedCoupon.getImage());
 	}
 
 	private Coupon createCoupon() {
+		Coupon result = new Coupon();
+		int amount = readInteger("coupon amount");
+		String title = inputData("coupon title");
+		String message = inputData("coupon message");
+		Category type = selectCategory();
+		double price = readDouble("coupon price");
+		Date startDate = readDate("coupon start date");
+		Date endDate = readDate("coupon end date");
+		String image = inputData("coupon image");
+		result.setAmount(amount);
+		result.setCouponType(type);
+		result.setEndDate(endDate);
+		result.setStartDate(startDate);
+		result.setImage(image);
+		result.setMessage(message);
+		result.setPrice(price);
+		result.setTitle(title);
 		// TODO Auto-generated method stub
-		return null;
+		return result;
 	}
 
-	
+	private Date readDate(String message) {
+		while (true) {
+			System.out.println("enter" + message);
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
+			String input = in.next();
+			try {
+				Date result = sdf.parse(input);
+				return result;
+			} catch (ParseException e) {
+				System.out.println("invalid date");
+			}
+		}
+	}
 
 	private double getMaxPrice() {
-		// TODO Auto-generated method stub
-		return 0;
+		while (true) {
+			try {
+				System.out.println("enter a number");
+				Double result = Double.parseDouble(in.next());
+				return result;
+			} catch (NumberFormatException e) {
+				continue;
+			}
+		}
 	}
 
 	private Category selectCategory() {
-		// TODO Auto-generated method stub
-		return null;
+		for (Category category : Category.values()) {
+			System.out.println(category);
+		}
+		return Category.valueOf(in.next());
 	}
 
 	private <T> int selectFromList(Collection<T> listToSelectFrom) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+		readList(listToSelectFrom);
 
-	private void updateCustomer(Customer customerToUpdate) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private Customer createCustomer() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private void updateCompany(Company companyToUpdate) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private <T> void readList(Collection<T> allCompanies){
-		// TODO Auto-generated method stub
-		
-	}
-
-	private int readById(String string) {
-		System.out.println("enter the id of the " + string);
 		// TODO Auto-generated method stub
 		return -1;
 	}
 
+	private void updateCustomer(Customer customerToUpdate) {
+		Customer updatedDetails = createCustomer();
+		customerToUpdate.setFirstName(updatedDetails.getFirstName());
+		customerToUpdate.setLastName(updatedDetails.getLastName());
+		customerToUpdate.setEmail(updatedDetails.getEmail());
+		customerToUpdate.setPassword(updatedDetails.getPassword());
+	}
+
+	private Customer createCustomer() {
+		Customer result = new Customer();
+		result.setFirstName(inputData("customer's first name"));
+		result.setLastName(inputData("customer's last name"));
+		result.setEmail(inputData("customer's email"));
+		result.setPassword(inputData("customer's password"));
+
+		return result;
+	}
+
+	private void updateCompany(Company companyToUpdate) {
+		Company updatedCompany = createCompany();
+		companyToUpdate.setName(updatedCompany.getName());
+		companyToUpdate.setEmail(updatedCompany.getEmail());
+		companyToUpdate.setPassword(updatedCompany.getPassword());
+
+	}
+
+	private <T> void readList(Collection<T> collection) {
+		for (T t : collection) {
+			System.out.println(t);
+		}
+	}
+
+	private int readInteger(String string) {
+		while (true) {
+			try {
+				System.out.println("enter " + string);
+				Integer result = Integer.parseInt(in.next());
+				return result;
+			} catch (NumberFormatException e) {
+				System.out.println("invalid number");
+				continue;
+			}
+		}
+	}
+
+	private double readDouble(String string) {
+		while (true) {
+			try {
+				System.out.println("enter " + string);
+				Double result = Double.parseDouble(in.next());
+				return result;
+			} catch (NumberFormatException e) {
+				System.out.println("invalid number");
+				continue;
+			}
+		}
+	}
+
 	private Company createCompany() {
-		// TODO Auto-generated method stub
-		return null;
+		Company result = new Company();
+		result.setName(inputData("company name"));
+		result.setEmail(inputData("company email"));
+		result.setPassword(inputData("company password"));
+		return result;
 	}
 
 	private void exit() {
 		quit = false;
+		dailyJob.stop();
 	}
 
 	private void startProgram() {
 		hasStarted = true;
+		Thread job = new Thread(dailyJob);
+		job.start();
 	}
 
 	private void showOptions() {
-		List<String> options =new ArrayList<String>;
-	options.add("start");
-	options.add("login");
-	options.add("exit");
-		
-	if(facade instanceof AdminFacade) {
-		options.add("add company");
-		options.add("update company");
-		options.add("delete company");
-		options.add("show all companies");
-		options.add("get company by id");
-		options.add("add customer");
-		options.add("update customer");
-		options.add("delete customer");
-		options.add("show all customers");
-		options.add("get customer by id");
-	}
+		List<String> options = new ArrayList<String>();
+		options.add("start");
+		options.add("login");
+		options.add("exit");
+
+		if (facade instanceof AdminFacade) {
+			options.add("add company");
+			options.add("update company");
+			options.add("delete company");
+			options.add("show all companies");
+			options.add("get company by id");
+			options.add("add customer");
+			options.add("update customer");
+			options.add("delete customer");
+			options.add("show all customers");
+			options.add("get customer by id");
+		}
+		if (facade instanceof CustomerFacade) {
+			options.add("purchase coupon");
+			options.add("get all coupons");
+			options.add("get coupons by category");
+			options.add("get coupons by max price");
+			options.add("get customer details");
+		}
+
+		if (facade instanceof CompanyFacade) {
+			options.add("add coupon");
+			options.add("delete coupon");
+			options.add("update coupon");
+			options.add("get all coupons");
+			options.add("get coupons by category");
+			options.add("get coupons by max price");
+			options.add("get company details");
+		}
+
+		for (String string : options) {
+			System.out.println(string);
+		}
 	}
 
 	private void login() throws CouponSystemException {
 		facade = LoginManager.getInstance().login(inputData("email"), inputData("password"));
-
 	}
 
 	private String inputData(String propertyToInput) {
