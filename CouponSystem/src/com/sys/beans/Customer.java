@@ -3,6 +3,14 @@ package com.sys.beans;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 
+ * @authors Yaniv Chen & Gil Gouetta
+ * 
+ * This is The Customer javabean class.
+ *
+ */
+
 public class Customer {
 	private int id;
 	private String firstName,lastName, password,email;

@@ -4,7 +4,13 @@ package com.sys.beans;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * 
+ * @authors Yaniv Chen & Gil Gouetta
+ * 
+ * This is The Company javabean class.
+ *
+ */
 public class Company {
 private int id;
 private String name,password,email;

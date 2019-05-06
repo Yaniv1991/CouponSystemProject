@@ -3,6 +3,15 @@ package com.sys.beans;
 
 import java.util.Date;
 
+/**
+ * 
+ * @authors Yaniv Chen & Gil Gouetta
+ * 
+ * This is The Coupon javabean class.
+ *
+ */
+
+
 public class Coupon {
 	private int id,companyId,categoryId;
 	public int getCategoryId() {

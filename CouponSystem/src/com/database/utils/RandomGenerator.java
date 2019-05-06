@@ -9,7 +9,12 @@ import java.sql.Statement;
 import java.util.Random;
 
 import com.sys.beans.Company;
-
+/**
+ * 
+ * @authors Yaniv Chen & Gil Gouetta
+ * @deprecated
+ *
+ */
 public class RandomGenerator {
 private static Random rnd = new Random();
 private static String url = "jdbc:derby://localhost:1527/random";

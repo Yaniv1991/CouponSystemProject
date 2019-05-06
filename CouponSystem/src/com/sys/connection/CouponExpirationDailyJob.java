@@ -11,6 +11,15 @@ import com.sys.beans.Coupon;
 import com.sys.dao.CouponDBDAO;
 import com.sys.exception.CouponSystemException;
 
+/**
+ * 
+ * @authors Yaniv Chen & Gil Gouetta.
+ * 
+ * Creates the daily job for the DB that deletes expired coupons.
+ *
+ */
+
+
 public class CouponExpirationDailyJob implements Runnable {
 
 	private boolean quit = false;
@@ -18,6 +27,13 @@ public class CouponExpirationDailyJob implements Runnable {
 	private final long sleepTime = 86400000;
 	private List<Coupon> expiredCoupons;
 
+	
+/**
+ * 
+ * Implements {@code runnable} method {@code run()}.</br>
+ * This Daily job is affectively running everyday while the system is up.
+ * 
+ */
 	@Override
 	public void run() {
 		while (!quit) {
@@ -38,11 +54,29 @@ public class CouponExpirationDailyJob implements Runnable {
 		}
 	}
 
+/**
+ * 
+ * {@code removeExpiredCouponsFromDB}</br></br>
+ * Removes expired coupons from the DB.</br>
+ * Iterates through all coupons in the list, pulled from the DB, </br>
+ * and "cleaned" using {@link #removeUnexpiredCouponsFromList() removeUnexpiredCouponsFromList} and deletes all of them.
+ * 
+ * @throws CouponSystemException
+ */
+	
 	private void removeExpiredCouponsFromDB() throws CouponSystemException {
 		for (Coupon expiredCoupon : expiredCoupons) {
 				dao.delete(expiredCoupon.getId());
 		}
 	}
+
+/**
+ * {@code allCouponsWereDeleted}</br></br>
+ * Checks if all expired coupons were deleted.	
+ * 
+ * @return True if the list of coupons to delete is empty, False otherwise.
+ * @throws CouponSystemException
+ */
 
 	private boolean allCouponsWereDeleted() throws CouponSystemException {
 
@@ -55,6 +89,13 @@ public class CouponExpirationDailyJob implements Runnable {
 		return true;
 	}
 
+/**
+ * {@code removeUnexpiredCouponsFromList}</br></br>
+ * Iterates through the list of coupons, pulled from the DB,</br>
+ * and removes the ones that haven't expired.
+ * 
+ */
+	
 	private void removeUnexpiredCouponsFromList() {
 		ZonedDateTime today = LocalDate.now().atStartOfDay(ZoneId.systemDefault());
 		for (int i = 0; i < expiredCoupons.size(); i++) {
@@ -63,7 +104,11 @@ public class CouponExpirationDailyJob implements Runnable {
 			}
 		}
 	}
-
+/**
+ * {@code stop}</br></br>
+ * Stops the thread. Sets {@code quit} to true. 
+ * 
+ */
 	public void stop() {
 		quit = true;
 	}
