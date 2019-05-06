@@ -13,7 +13,7 @@ public class ConnectionPool {
 	private static final int MAX_CONNECTIONS = 10;
 	private static ConnectionPool instance;
 	private Set<Connection> connections = new HashSet<>();
-	private String url = "jdbc:derby://localhost:1527/db1";
+	private String url = "jdbc:derby://localhost:1527/CouponSystemDb";
 	private boolean poolIsClosing = false;
 
 	private ConnectionPool() throws ConnectionException {

@@ -26,7 +26,7 @@ public class LoginManager {
 	public ClientFacade login(String email, String password) throws CouponSystemException {
 
 		ClientFacade facade = null;
-		if (email == "admin@admin.com" && password == "admin") {
+		if (email.equalsIgnoreCase("admin@admin.com") && password.equals("admin")) {
 			facade = new AdminFacade(customerDao, companyDao, couponDao);
 		} else if (companyDao.exists(email, password)) {
 			facade = new CompanyFacade(companyDao.getIdByEmail(email), companyDao, couponDao);

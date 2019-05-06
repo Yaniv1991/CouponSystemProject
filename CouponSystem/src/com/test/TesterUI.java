@@ -21,7 +21,7 @@ import com.sys.facades.CustomerFacade;
 import com.sys.facades.LoginManager;
 
 public class TesterUI {
-	private Scanner in = new Scanner(System.in);
+	private final Scanner in = new Scanner(System.in);
 	private CouponExpirationDailyJob dailyJob;
 
 	private ClientFacade facade;
@@ -44,7 +44,7 @@ public class TesterUI {
 	private void showMenu() throws CouponSystemException {
 
 		showOptions();
-		String command = in.next();
+		String command = in.nextLine();
 		performAction(command);
 	}
 
@@ -77,7 +77,7 @@ public class TesterUI {
 				AdminFacade facade = (AdminFacade) this.facade;
 				/// ....Lots of options
 				switch (command) {
-				case "add company": {
+				case "create company": {
 					facade.addCompany(createCompany());
 					break;
 				}
@@ -118,9 +118,9 @@ public class TesterUI {
 					facade.updateCustomer(customerToUpdate);
 					break;
 				}
-				default: {
-					throw new CouponSystemException("invalid input");
-				}
+//				default: {
+//					throw new CouponSystemException("invalid input");
+//				}
 				}
 			}
 
@@ -152,9 +152,9 @@ public class TesterUI {
 					break;
 				}
 
-				default: {
-					throw new CouponSystemException("invalid input");
-				}
+//				default: {
+//					throw new CouponSystemException("invalid input");
+//				}
 				}
 
 			} else if (facade instanceof CompanyFacade) {
@@ -193,9 +193,9 @@ public class TesterUI {
 					;
 					break;
 				}
-				default: {
-					throw new CouponSystemException("invalid input");
-				}
+//				default: {
+//					throw new CouponSystemException("invalid input");
+//				}
 				}
 
 			}
@@ -241,7 +241,7 @@ public class TesterUI {
 		while (true) {
 			System.out.println("enter" + message);
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
-			String input = in.next();
+			String input = in.nextLine();
 			try {
 				Date result = sdf.parse(input);
 				return result;
@@ -255,7 +255,7 @@ public class TesterUI {
 		while (true) {
 			try {
 				System.out.println("enter a number");
-				Double result = Double.parseDouble(in.next());
+				Double result = Double.parseDouble(in.nextLine());
 				return result;
 			} catch (NumberFormatException e) {
 				continue;
@@ -267,7 +267,7 @@ public class TesterUI {
 		for (Category category : Category.values()) {
 			System.out.println(category);
 		}
-		return Category.valueOf(in.next());
+		return Category.valueOf(in.nextLine());
 	}
 
 	private <T> int selectFromList(Collection<T> listToSelectFrom) {
@@ -313,7 +313,7 @@ public class TesterUI {
 		while (true) {
 			try {
 				System.out.println("enter " + string);
-				Integer result = Integer.parseInt(in.next());
+				Integer result = Integer.parseInt(in.nextLine());
 				return result;
 			} catch (NumberFormatException e) {
 				System.out.println("invalid number");
@@ -326,7 +326,7 @@ public class TesterUI {
 		while (true) {
 			try {
 				System.out.println("enter " + string);
-				Double result = Double.parseDouble(in.next());
+				Double result = Double.parseDouble(in.nextLine());
 				return result;
 			} catch (NumberFormatException e) {
 				System.out.println("invalid number");
@@ -336,6 +336,7 @@ public class TesterUI {
 	}
 
 	private Company createCompany() {
+		System.out.println("Creating company");
 		Company result = new Company();
 		result.setName(inputData("company name"));
 		result.setEmail(inputData("company email"));
@@ -390,18 +391,24 @@ public class TesterUI {
 			options.add("get company details");
 		}
 
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		
 		for (String string : options) {
 			System.out.println(string);
 		}
 	}
 
 	private void login() throws CouponSystemException {
-		facade = LoginManager.getInstance().login(inputData("email"), inputData("password"));
+		String email = inputData("email");
+		String password = inputData("password");
+		facade = LoginManager.getInstance().login(email,password);
 	}
 
 	private String inputData(String propertyToInput) {
 		System.out.println("enter " + propertyToInput);
-
-		return in.next();
+		String result = in.nextLine();
+		return result;
 	}
 }

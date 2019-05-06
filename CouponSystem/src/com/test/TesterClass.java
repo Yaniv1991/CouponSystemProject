@@ -9,6 +9,6 @@ public class TesterClass {
 	
 	private static void testAll() {
 		TesterUI ui = new TesterUI();
-		
+		ui.startUI();
 	}
 }

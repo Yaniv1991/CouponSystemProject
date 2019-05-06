@@ -99,13 +99,6 @@ public class Coupon {
 		this.title = title;
 	}
 
-	public String getMessage() {
-		return description;
-	}
-
-	public void setMessage(String message) {
-		this.description = message;
-	}
 
 	public Category getCouponType() {
 		return category;
