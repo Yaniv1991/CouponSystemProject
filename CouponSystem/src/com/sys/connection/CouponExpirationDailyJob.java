@@ -10,11 +10,17 @@ import com.database.utils.DbExceptionHandler;
 import com.sys.beans.Coupon;
 import com.sys.dao.CouponDBDAO;
 import com.sys.exception.CouponSystemException;
+import com.sys.facades.LoginManager;
 
 public class CouponExpirationDailyJob implements Runnable {
 
 	private boolean quit = false;
-	private CouponDBDAO dao = new CouponDBDAO();
+	private CouponDBDAO couponDao ;
+	public CouponExpirationDailyJob() {
+		super();
+		this.couponDao = LoginManager.getInstance().getCouponDao();
+	}
+
 	private final long sleepTime = 86400000;
 	private List<Coupon> expiredCoupons;
 
@@ -22,7 +28,7 @@ public class CouponExpirationDailyJob implements Runnable {
 	public void run() {
 		while (!quit) {
 			try {
-				expiredCoupons = (List<Coupon>) dao.readAll();
+				expiredCoupons = (List<Coupon>) couponDao.readAll();
 				removeUnexpiredCouponsFromList();
 				removeExpiredCouponsFromDB();
 				if (allCouponsWereDeleted()) {
@@ -40,14 +46,14 @@ public class CouponExpirationDailyJob implements Runnable {
 
 	private void removeExpiredCouponsFromDB() throws CouponSystemException {
 		for (Coupon expiredCoupon : expiredCoupons) {
-				dao.delete(expiredCoupon.getId());
+				couponDao.delete(expiredCoupon.getId());
 		}
 	}
 
 	private boolean allCouponsWereDeleted() throws CouponSystemException {
 
 		for (Coupon expiredCoupon : expiredCoupons) {
-				if (dao.read(expiredCoupon.getId()) != null) {
+				if (couponDao.read(expiredCoupon.getId()) != null) {
 					return false;
 			}
 		}

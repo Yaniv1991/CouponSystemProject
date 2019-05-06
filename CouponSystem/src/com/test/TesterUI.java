@@ -206,7 +206,6 @@ public class TesterUI {
 	}
 
 	private void updateCoupon(Coupon couponToUpdate) {
-		// TODO Auto-generated method stub
 		Coupon updatedCoupon = createCoupon();
 		couponToUpdate.setAmount(updatedCoupon.getAmount());
 		couponToUpdate.setTitle(updatedCoupon.getTitle());
@@ -236,7 +235,6 @@ public class TesterUI {
 		result.setDescription(message);
 		result.setPrice(price);
 		result.setTitle(title);
-		// TODO Auto-generated method stub
 		return result;
 	}
 
@@ -286,7 +284,6 @@ public class TesterUI {
 		companyToUpdate.setName(updatedCompany.getName());
 		companyToUpdate.setEmail(updatedCompany.getEmail());
 		companyToUpdate.setPassword(updatedCompany.getPassword());
-
 	}
 
 	private <T> void readList(Collection<T> collection) {
@@ -311,7 +308,6 @@ public class TesterUI {
 	private double readDouble(String message) {
 		while (true) {
 			try {
-				
 				Double result = Double.parseDouble(inputData(message));
 				return result;
 			} catch (NumberFormatException e) {
@@ -322,7 +318,6 @@ public class TesterUI {
 	}
 
 	private Company createCompany() {
-//		System.out.println("Creating company");
 		Company result = new Company();
 		result.setName(inputData("company name"));
 		result.setEmail(inputData("company email"));
@@ -337,6 +332,7 @@ public class TesterUI {
 
 	private void startProgram() {
 		hasStarted = true;
+		dailyJob = new CouponExpirationDailyJob();
 		Thread job = new Thread(dailyJob);
 		job.start();
 	}
@@ -394,7 +390,6 @@ public class TesterUI {
 
 	private String inputData(String propertyToInput) {
 		System.out.println("enter " + propertyToInput);
-//		String result = in.nextLine();
 		return in.nextLine();
 	}
 }
