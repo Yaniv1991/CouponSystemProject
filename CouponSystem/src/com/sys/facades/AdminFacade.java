@@ -57,7 +57,7 @@ private CouponDBDAO couponDao;
 		companyDao.update(company);
 	}
 
-	public void deleteCompany(Company company) throws CouponException, CompanyException {
+	public void removeCompany(Company company) throws CouponException, CompanyException {
 		for (Coupon coupon : company.getCoupons()) {
 			couponDao.delete(coupon.getId());
 		}
@@ -101,7 +101,7 @@ private CouponDBDAO couponDao;
 		return customerDao.readAll();
 	}
 
-	public Customer returnCustomerById(int customerId) throws CustomerException {
+	public Customer getCustomerById(int customerId) throws CustomerException {
 		return customerDao.read(customerId);
 	}
 

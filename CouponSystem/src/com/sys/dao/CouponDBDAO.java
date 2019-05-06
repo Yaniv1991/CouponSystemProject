@@ -11,6 +11,7 @@ import com.sys.beans.Customer;
 import com.sys.connection.ConnectionPool;
 import com.sys.exception.ConnectionException;
 import com.sys.exception.CouponException;
+import com.sys.exception.CouponSystemException;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -35,6 +36,12 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 
 	
 	private Connection connection;
+	private CategoryDBDAO categoryDao;
+
+	public CouponDBDAO(CategoryDBDAO categoryDao) {
+		super();
+		this.categoryDao = categoryDao;
+	}
 
 	@Override
 	public void create(Coupon coupon) throws CouponException {
@@ -77,21 +84,21 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 				result = readFromActiveConnection(id, rs);
 			}
 
-		} catch (SQLException e) {
+		} catch (SQLException | CouponSystemException e) {
 			throw new CouponException("error in reading coupon",e);
 		}
 		finally {disconnect();}
 		return result;
 	}
 
-	private Coupon readFromActiveConnection(int id, ResultSet rs) throws SQLException {
+	private Coupon readFromActiveConnection(int id, ResultSet rs) throws SQLException, CouponSystemException {
 		Coupon result;
 		result = new Coupon();
 
 		int amount = rs.getInt("amount");
 		String title = rs.getString("title");
 		String description = rs.getString("description");
-		Category type = Category.valueOf(rs.getString("category_id"));
+		Category type = categoryDao.read(rs.getInt("type"));
 		double price = rs.getDouble("price");
 		Date startDate = rs.getDate("start_date");
 		Date endDate = rs.getDate("end_date");
@@ -159,7 +166,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 				result.add(readFromActiveConnection(rs.getInt("id"), rs));
 			}
 
-		} catch (SQLException e) {
+		} catch (SQLException | CouponSystemException e) {
 			throw new CouponException("error in reading all coupons",e);
 		} finally {
 			disconnect();
@@ -177,7 +184,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 				result.add(readFromActiveConnection(rs.getInt("id"), rs));
 			}
 
-		} catch (SQLException e) {
+		} catch (SQLException | CouponSystemException e) {
 			throw new CouponException("Exception raised in reading all coupons",e);
 		} finally {
 			disconnect();
@@ -198,7 +205,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 			while(rs.next()) {
 				result.add(readFromActiveConnection(rs.getInt("coupon_id"),rs));
 			}
-		} catch (SQLException e) {
+		} catch (SQLException | CouponSystemException e) {
 			throw new CouponException("error in reading all coupons of customer", e);
 		}
 		finally {

@@ -14,9 +14,6 @@ import com.sys.exception.CouponSystemException;
 public class CompanyFacade extends ClientFacade{
 
 	private Company company;
-	public Company getCompany() {
-		return company;
-	}
 
 	private CompanyDBDAO companyDao;
 	private CouponDBDAO couponDao;
@@ -54,7 +51,7 @@ public class CompanyFacade extends ClientFacade{
 		couponDao.update(coupon);
 	}
 	
-	public void RemoveCoupon (Coupon coupon) throws CouponException {
+	public void removeCoupon (Coupon coupon) throws CouponException {
 			couponDao.delete(coupon.getId());
 	}
 	

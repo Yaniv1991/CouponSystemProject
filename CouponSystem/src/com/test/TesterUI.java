@@ -77,16 +77,8 @@ public class TesterUI {
 				AdminFacade facade = (AdminFacade) this.facade;
 				/// ....Lots of options
 				switch (command) {
-				case "create company": {
+				case "add company": {
 					facade.addCompany(createCompany());
-					break;
-				}
-				case "remove company": {
-					facade.deleteCompany(new Company(readInteger("company")));
-					break;
-				}
-				case "read all companies": {
-					readList(facade.getAllCompanies());
 					break;
 				}
 				case "update company": {
@@ -97,12 +89,25 @@ public class TesterUI {
 					facade.updateCompany(companyToUpdate);
 					break;
 				}
+				case "delete company": {
+					facade.removeCompany(new Company(readInteger("company")));
+					break;
+				}
+				case "show all companies": {
+					readList(facade.getAllCompanies());
+					break;
+				}
+				case "get company by id":{
+					System.out.println(facade.getCompanyById(readInteger("company id")));
+					break;
+				}
 
 				case "add customer": {
 					facade.addCustomer(createCustomer());
 					break;
 				}
-				case "remove customer": {
+				
+				case "delete customer": {
 					facade.removeCustomer(new Customer(readInteger("customer")));
 					break;
 				}
@@ -111,12 +116,14 @@ public class TesterUI {
 					break;
 				}
 				case "update customer": {
-					List<Customer> customers = (List<Customer>) facade.getAllCustomers();
-					readList(customers);
-					Customer customerToUpdate = facade.returnCustomerById(readInteger("customer"));
+					
+					Customer customerToUpdate = facade.getCustomerById(readInteger("customer id"));
 					updateCustomer(customerToUpdate);
 					facade.updateCustomer(customerToUpdate);
 					break;
+				}
+				case "get customer by id":{
+					System.out.println(facade.getCustomerById(readInteger("customer id")));
 				}
 //				default: {
 //					throw new CouponSystemException("invalid input");
@@ -128,26 +135,23 @@ public class TesterUI {
 				CustomerFacade facade = (CustomerFacade) this.facade;
 				switch (command) {
 				case "purchase coupon": {
-					facade.purchaseCoupon(selectFromList((List<Coupon>) facade.getAllCopouns()));
+					facade.purchaseCoupon(readInteger("coupon id"));
 					break;
 				}
-				case "cancel purchase": {
-					/// ...TODO ....
-					break;
-				}
-				case "read all purchased coupons": {
+				
+				case "get all coupons": {
 					readList(facade.getAllCopounsOfCustomer());
 					break;
 				}
-				case "read all purchased coupons by category": {
+				case "get coupons by category": {
 					readList(facade.getAllCopounsByCategory(selectCategory()));
 					break;
 				}
-				case "read all purchased coupons by max price": {
-					readList(facade.getAllCopounsByMaxPrice(getMaxPrice()));
+				case "get coupons by max price": {
+					readList(facade.getAllCopounsByMaxPrice(readDouble("coupon max price")));
 					break;
 				}
-				case "read customer details": {
+				case "get company details": {
 					System.out.println(facade.getCustomerDetails());
 					break;
 				}
@@ -165,8 +169,7 @@ public class TesterUI {
 					break;
 				}
 				case "delete coupon": {
-					// TODO ....
-
+					facade.removeCoupon(new Coupon(readInteger("coupon id")));
 					break;
 				}
 				case "update coupon": {
@@ -176,16 +179,16 @@ public class TesterUI {
 					facade.updateCoupon(couponToUpdate);
 					break;
 				}
-				case "read all coupons": {
+				case "get all coupons": {
 					readList(facade.returnAllCoupons());
 					break;
 				}
-				case "read coupons by category": {
+				case "get coupons by category": {
 					readList(facade.returnAllCouponsByCategory(selectCategory()));
 					break;
 				}
-				case "read coupons by max price": {
-					readList(facade.returnAllCouponsByMaxPrice(getMaxPrice()));
+				case "get coupons by max price": {
+					readList(facade.returnAllCouponsByMaxPrice(readDouble("coupon max price")));
 					break;
 				}
 				case "get company details": {
@@ -251,17 +254,6 @@ public class TesterUI {
 		}
 	}
 
-	private double getMaxPrice() {
-		while (true) {
-			try {
-				System.out.println("enter a number");
-				Double result = Double.parseDouble(in.nextLine());
-				return result;
-			} catch (NumberFormatException e) {
-				continue;
-			}
-		}
-	}
 
 	private Category selectCategory() {
 		for (Category category : Category.values()) {
@@ -270,12 +262,6 @@ public class TesterUI {
 		return Category.valueOf(in.nextLine());
 	}
 
-	private <T> int selectFromList(Collection<T> listToSelectFrom) {
-		readList(listToSelectFrom);
-
-		// TODO Auto-generated method stub
-		return -1;
-	}
 
 	private void updateCustomer(Customer customerToUpdate) {
 		Customer updatedDetails = createCustomer();
@@ -309,11 +295,11 @@ public class TesterUI {
 		}
 	}
 
-	private int readInteger(String string) {
+	private int readInteger(String message) {
 		while (true) {
 			try {
-				System.out.println("enter " + string);
-				Integer result = Integer.parseInt(in.nextLine());
+				System.out.println("enter " + message);
+				Integer result = Integer.parseInt(inputData(message));
 				return result;
 			} catch (NumberFormatException e) {
 				System.out.println("invalid number");
@@ -322,11 +308,11 @@ public class TesterUI {
 		}
 	}
 
-	private double readDouble(String string) {
+	private double readDouble(String message) {
 		while (true) {
 			try {
-				System.out.println("enter " + string);
-				Double result = Double.parseDouble(in.nextLine());
+				
+				Double result = Double.parseDouble(inputData(message));
 				return result;
 			} catch (NumberFormatException e) {
 				System.out.println("invalid number");
@@ -336,7 +322,7 @@ public class TesterUI {
 	}
 
 	private Company createCompany() {
-		System.out.println("Creating company");
+//		System.out.println("Creating company");
 		Company result = new Company();
 		result.setName(inputData("company name"));
 		result.setEmail(inputData("company email"));
@@ -345,7 +331,7 @@ public class TesterUI {
 	}
 
 	private void exit() {
-		quit = false;
+		quit = true;
 		dailyJob.stop();
 	}
 
@@ -408,7 +394,7 @@ public class TesterUI {
 
 	private String inputData(String propertyToInput) {
 		System.out.println("enter " + propertyToInput);
-		String result = in.nextLine();
-		return result;
+//		String result = in.nextLine();
+		return in.nextLine();
 	}
 }

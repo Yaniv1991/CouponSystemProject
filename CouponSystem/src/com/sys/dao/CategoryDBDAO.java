@@ -4,7 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 import com.sys.beans.Category;
 import com.sys.connection.ConnectionPool;
@@ -17,7 +20,8 @@ public class CategoryDBDAO implements DAO<Category>{
 	private Connection connection;
 	
 	private static String readCategoryById = "select * from categories where id = ?";
-private static String createCategory= "insert into categories(name) values(?)";
+	private static String createCategory= "insert into categories(name) values(?)";
+	private static String deleteCategory= "DELETE FROM categories WHERE id = ?";
 
 @Override
 public void create(Category category) throws CouponSystemException {
@@ -36,9 +40,9 @@ public void create(Category category) throws CouponSystemException {
 public Category read(int categoryId) throws CouponSystemException {
 	Category category = null;
 	connect();
-	try(PreparedStatement create = connection.prepareStatement(readCategoryById)){
-		create.setInt(1, categoryId);
-		ResultSet result = create.executeQuery();
+	try(PreparedStatement read = connection.prepareStatement(readCategoryById)){
+		read.setInt(1, categoryId);
+		ResultSet result = read.executeQuery();
 		if(result.next()) {
 			category = Category.valueOf(result.getString("name"));
 		}
@@ -51,20 +55,28 @@ public Category read(int categoryId) throws CouponSystemException {
 
 @Override
 public void update(Category category) throws CouponSystemException {
-	// TODO Auto-generated method stub
-	
+	throw new CouponSystemException("cannot update an Enum constant");
 }
 
 @Override
-public void delete(int id) throws CouponSystemException {
-	// TODO Auto-generated method stub
-	
+public void delete(int categoryId) throws CouponSystemException {
+	connect();
+	try(PreparedStatement delete = connection.prepareStatement(deleteCategory)){
+		delete.setInt(1, categoryId);;
+		delete.execute();
+	} catch (SQLException e) {
+		throw new CouponSystemException("error in creating category entry",e);
+	} finally {disconnect();
+	}
 }
 
 @Override
 public Collection<Category> readAll() throws CouponSystemException {
-	// TODO Auto-generated method stub
-	return null;
+	List<Category> result = new ArrayList<>(Category.values().length);
+	for(Category category : Category.values()) {
+		result.add(category);
+	}
+	return result;
 }
 
 
