@@ -91,7 +91,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		int amount = rs.getInt("amount");
 		String title = rs.getString("title");
 		String description = rs.getString("description");
-		Category type = Category.valueOf(rs.getString("type"));
+		Category type = Category.valueOf(rs.getString("category_id"));
 		double price = rs.getDouble("price");
 		Date startDate = rs.getDate("start_date");
 		Date endDate = rs.getDate("end_date");

@@ -207,7 +207,7 @@ public class TesterUI {
 		Coupon updatedCoupon = createCoupon();
 		couponToUpdate.setAmount(updatedCoupon.getAmount());
 		couponToUpdate.setTitle(updatedCoupon.getTitle());
-		couponToUpdate.setMessage(updatedCoupon.getMessage());
+		couponToUpdate.setDescription(updatedCoupon.getDescription());
 		couponToUpdate.setCategory(updatedCoupon.getCategory());
 		couponToUpdate.setPrice(updatedCoupon.getPrice());
 		couponToUpdate.setStartDate(updatedCoupon.getStartDate());
@@ -230,7 +230,7 @@ public class TesterUI {
 		result.setEndDate(endDate);
 		result.setStartDate(startDate);
 		result.setImage(image);
-		result.setMessage(message);
+		result.setDescription(message);
 		result.setPrice(price);
 		result.setTitle(title);
 		// TODO Auto-generated method stub
