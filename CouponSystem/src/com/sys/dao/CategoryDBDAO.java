@@ -100,7 +100,7 @@ public Collection<Category> readAll() throws CouponSystemException {
 
 public Map<Integer,Category> allCategoriesById(){
 	Map<Integer,Category> result = new HashMap<Integer,Category>();
-	for(int i = 0; i<=Category.values().length;i++) {
+	for(int i = 0; i<Category.values().length;i++) {
 		result.put(i+1, Category.values()[i]);
 	}
 	return result;

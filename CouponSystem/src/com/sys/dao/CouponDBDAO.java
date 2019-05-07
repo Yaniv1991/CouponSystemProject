@@ -2,6 +2,7 @@ package com.sys.dao;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,8 +44,9 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 	public CouponDBDAO(CategoryDBDAO categoryDao) {
 		super();
 		this.categoryDictionary = categoryDao.allCategoriesById();
-		for(int i = 1;i<=categoryDictionary.size();i++) {
-			reverseCategoryDictionary.put(categoryDictionary.get(i), i);
+		reverseCategoryDictionary = new HashMap<Category, Integer>();
+		for(int i = 0;i<categoryDictionary.size()-1;i++) {
+			reverseCategoryDictionary.put(categoryDictionary.get(i+1), i+1);
 		}
 	}
 
