@@ -6,7 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.sys.beans.Category;
 import com.sys.connection.ConnectionPool;
@@ -52,6 +54,23 @@ public Category read(int categoryId) throws CouponSystemException {
 	return category;
 }
 
+public int getCategoryId(Category category) throws CouponSystemException {
+	int result = 1;
+	String sql = "select id from categories where name = ?";
+	try(PreparedStatement read = connection.prepareStatement(sql)){
+		read.setString(1, category.toString());
+		ResultSet rs = read.executeQuery();
+		if(rs.next()) {
+			result = rs.getInt("id");
+		}
+	} catch (SQLException e) {
+		throw new CouponSystemException("error in creating category entry",e);
+	} finally {disconnect();
+	}
+	
+	return result;
+}
+
 @Override
 public void update(Category category) throws CouponSystemException {
 	throw new CouponSystemException("cannot update an Enum constant");
@@ -74,6 +93,15 @@ public Collection<Category> readAll() throws CouponSystemException {
 	List<Category> result = new ArrayList<>(Category.values().length);
 	for(Category category : Category.values()) {
 		result.add(category);
+	}
+	return result;
+	
+}
+
+public Map<Integer,Category> allCategoriesById(){
+	Map<Integer,Category> result = new HashMap<Integer,Category>();
+	for(int i = 0; i<=Category.values().length;i++) {
+		result.put(i+1, Category.values()[i]);
 	}
 	return result;
 }

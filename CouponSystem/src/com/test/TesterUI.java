@@ -222,13 +222,13 @@ public class TesterUI {
 		int amount = readInteger("coupon amount");
 		String title = inputData("coupon title");
 		String message = inputData("coupon message");
-		Category type = selectCategory();
+		Category category = selectCategory();
 		double price = readDouble("coupon price");
 		Date startDate = readDate("coupon start date");
 		Date endDate = readDate("coupon end date");
 		String image = inputData("coupon image");
 		result.setAmount(amount);
-		result.setCouponType(type);
+		result.setCategory(category);
 		result.setEndDate(endDate);
 		result.setStartDate(startDate);
 		result.setImage(image);

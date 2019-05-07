@@ -3,6 +3,7 @@ package com.sys.dao;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import com.sys.beans.Category;
 import com.sys.beans.Company;
@@ -21,8 +22,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class CouponDBDAO implements ElementDAO<Coupon> {
-	private static String sqlCreate = "insert into coupons "
-			+ "(company_id,category_id,title,start_date,end_date,amount,type,description,price,image) " + "values (?,?,?,?,?,?,?,?,?,?)";
+	private static String sqlCreate = 		 "insert into coupons "
+			+ "(company_id,category_id,title,description,start_date,end_date,amount,price,image) " + "values (?,?,?,?,?,?,?,?,?)";
 
 	private static String sqlRead = "select * from coupons where id = ?";
 
@@ -36,18 +37,22 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 
 	
 	private Connection connection;
-	private CategoryDBDAO categoryDao;
-
+	private Map<Integer,Category> categoryDictionary;
+	private Map<Category,Integer> reverseCategoryDictionary;
+	
 	public CouponDBDAO(CategoryDBDAO categoryDao) {
 		super();
-		this.categoryDao = categoryDao;
+		this.categoryDictionary = categoryDao.allCategoriesById();
+		for(int i = 1;i<=categoryDictionary.size();i++) {
+			reverseCategoryDictionary.put(categoryDictionary.get(i), i);
+		}
 	}
 
 	@Override
 	public void create(Coupon coupon) throws CouponException {
 		
 //		 "insert into coupons "
-//					+ "(company_id,category_id,title,start_date,end_date,amount,type,description,price,image) " + "values (?,?,?,?,?,?,?,?,?,?)"
+//					+ "(company_id,category_id,title,description,start_date,end_date,amount,price,image) " + "values (?,?,?,?,?,?,?,?,?)"
 		
 		connect();
 		try (PreparedStatement create = connection.prepareStatement(sqlCreate)) {
@@ -56,13 +61,12 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 			create.setInt(1, coupon.getCompanyId());
 			create.setInt(2, coupon.getCategoryId());
 			create.setString(3, coupon.getTitle());
-			create.setDate(4, startDate);
-			create.setDate(5, endDate);
-			create.setInt(6, coupon.getAmount());
-			create.setString(7, coupon.getCouponType().toString());
-			create.setString(8, coupon.getDescription());
-			create.setDouble(9, coupon.getPrice());
-			create.setString(10, coupon.getImage());
+			create.setString(4, coupon.getDescription());
+			create.setDate(5, startDate);
+			create.setDate(6, endDate);
+			create.setInt(7, coupon.getAmount());
+			create.setDouble(8, coupon.getPrice());
+			create.setString(9, coupon.getImage());
 
 			create.execute();
 		} catch (SQLException e) {
@@ -98,13 +102,14 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		int amount = rs.getInt("amount");
 		String title = rs.getString("title");
 		String description = rs.getString("description");
-		Category type = categoryDao.read(rs.getInt("type"));
+		Category category = categoryDictionary.get(rs.getInt("category_id"));
 		double price = rs.getDouble("price");
 		Date startDate = rs.getDate("start_date");
 		Date endDate = rs.getDate("end_date");
 		String image = rs.getString("image");
 		result.setAmount(amount);
-		result.setCouponType(type);
+		result.setCategory(category);
+		result.setCategoryId(reverseCategoryDictionary.get(category));
 		result.setEndDate(endDate);
 		result.setStartDate(startDate);
 		result.setId(id);
@@ -127,7 +132,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 			update.setDate(2, (Date) coupon.getStartDate());
 			update.setDate(3, (Date) coupon.getEndDate());
 			update.setInt(4, coupon.getAmount());
-			update.setString(5, coupon.getCategory().toString());
+			update.setInt(5, coupon.getCategoryId());
 			update.setString(6, coupon.getDescription());
 			update.setInt(7, coupon.getCompanyId());
 			update.setInt(8, coupon.getCategoryId());

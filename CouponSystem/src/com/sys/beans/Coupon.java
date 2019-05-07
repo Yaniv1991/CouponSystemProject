@@ -6,7 +6,7 @@ import java.util.Date;
 public class Coupon {
 	private int id,companyId,categoryId;
 	public int getCategoryId() {
-		return categoryId;
+		return categoryId;  //Ok, this should give me the id of the category enum. should i set it from the outside??
 	}
 
 	public void setCategoryId(int categoryId) {
@@ -99,14 +99,6 @@ public class Coupon {
 		this.title = title;
 	}
 
-
-	public Category getCouponType() {
-		return category;
-	}
-
-	public void setCouponType(Category couponType) {
-		this.category = couponType;
-	}
 
 	public double getPrice() {
 		return price;
