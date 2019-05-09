@@ -14,30 +14,18 @@ public class LoginManager {
 	private CategoryDBDAO categoryDao;
 
 	public CouponDBDAO getCouponDao() {
-		if(couponDao == null) {
-			couponDao = new CouponDBDAO(getCategoryDao());
-		}
 		return couponDao;
 	}
 
 	public CompanyDBDAO getCompanyDao() {
-		if(companyDao == null) {
-			companyDao= new CompanyDBDAO(getCouponDao());
-		}
 		return companyDao;
 	}
 
 	public CustomerDBDAO getCustomerDao() {
-		if(customerDao == null) {
-			customerDao = new CustomerDBDAO(getCouponDao());
-		}
 		return customerDao;
 	}
 
 	public CategoryDBDAO getCategoryDao() {
-		if(categoryDao == null) {
-			categoryDao= new CategoryDBDAO();
-		}
 		return categoryDao;
 	}
 

@@ -1,10 +1,10 @@
 package com.test;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
@@ -22,7 +22,7 @@ import com.sys.facades.LoginManager;
 
 public class TesterUI {
 	private final Scanner in = new Scanner(System.in);
-	private CouponExpirationDailyJob dailyJob;
+	private CouponExpirationDailyJob dailyJob = new CouponExpirationDailyJob();
 
 	private ClientFacade facade;
 	private boolean quit = false;
@@ -31,31 +31,39 @@ public class TesterUI {
 	public void startUI() {
 
 		while (!quit) {
-			try {
 				showMenu();
-
-			} catch (CouponSystemException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		}
 	}
 
-	private void showMenu() throws CouponSystemException {
+	private void showMenu()  {
 
 		showOptions();
-		String command = in.nextLine();
-		performAction(command);
+		boolean inputIsValid = false;
+		while(!inputIsValid) {
+		try {
+			performAction(in.nextLine());
+			inputIsValid = true;
+		} catch (CouponSystemException e) {
+			System.out.println("please enter a valid input");
+			e.printStackTrace();
+			continue;
+		}
+		}
 	}
 
-	private void performAction(String command) throws CouponSystemException {
-
+	private void performAction(String command) throws CouponSystemException  {
+		
 		if (!hasStarted) {
 			switch (command) {
 			case "start": {
 				startProgram();
 				break;
 			}
+			case "exit": {
+				exit();
+				break;
+			}
+
 			default: {
 				throw new CouponSystemException("program has not started");
 			}
@@ -218,15 +226,17 @@ public class TesterUI {
 	}
 
 	private Coupon createCoupon() {
+		int companyId = getCompanyIdFromFacade();
 		Coupon result = new Coupon();
 		int amount = readInteger("coupon amount");
 		String title = inputData("coupon title");
 		String message = inputData("coupon message");
 		Category category = selectCategory();
 		double price = readDouble("coupon price");
-		Date startDate = readDate("coupon start date");
-		Date endDate = readDate("coupon end date");
-		String image = inputData("coupon image");
+		LocalDate startDate = readDate("coupon start date yyyy-mm-dd");
+		LocalDate endDate = readDate("coupon end date yyyy-mm-dd");
+		String image = inputData("coupon image url");
+		result.setCompanyId(companyId);
 		result.setAmount(amount);
 		result.setCategory(category);
 		result.setEndDate(endDate);
@@ -235,29 +245,48 @@ public class TesterUI {
 		result.setDescription(message);
 		result.setPrice(price);
 		result.setTitle(title);
+		System.out.println("coupon created " + result);
 		return result;
 	}
 
-	private Date readDate(String message) {
-		while (true) {
-			System.out.println("enter" + message);
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
-			String input = in.nextLine();
+	private int getCompanyIdFromFacade() {
+		if(facade instanceof CompanyFacade) {
+			facade = (CompanyFacade)this.facade;
 			try {
-				Date result = sdf.parse(input);
-				return result;
-			} catch (ParseException e) {
-				System.out.println("invalid date");
+				return ((CompanyFacade) facade).getCompanyDetails().getId();
+			} catch (CouponSystemException e) {
+				return 0;
 			}
 		}
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	private LocalDate readDate(String message) {
+		while (true) {
+			try {
+			System.out.println("enter " + message);
+			String input = in.nextLine();
+			LocalDate result = LocalDate.parse(input, DateTimeFormatter.ofPattern("uuuu-MM-dd"));
+			return result;
+		}
+			catch(DateTimeParseException e) {
+				System.out.println("invalid input");
+			}
+			}
 	}
 
 
 	private Category selectCategory() {
+		while(true) {
+		try {
 		for (Category category : Category.values()) {
 			System.out.println(category);
 		}
-		return Category.valueOf(in.nextLine());
+		return Category.valueOf(in.nextLine().toUpperCase());}
+		catch(IllegalArgumentException e) {
+			System.out.println("please enter a valid category");
+		}}
 	}
 
 
@@ -295,7 +324,6 @@ public class TesterUI {
 	private int readInteger(String message) {
 		while (true) {
 			try {
-				System.out.println("enter " + message);
 				Integer result = Integer.parseInt(inputData(message));
 				return result;
 			} catch (NumberFormatException e) {
@@ -332,7 +360,7 @@ public class TesterUI {
 
 	private void startProgram() {
 		hasStarted = true;
-		dailyJob = new CouponExpirationDailyJob();
+
 		Thread job = new Thread(dailyJob);
 		job.start();
 	}

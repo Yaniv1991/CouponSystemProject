@@ -64,7 +64,7 @@ public class CompanyDBDAO implements UserDAO<Company> {
 
 			create.setString(1, company.getName());
 			create.setString(2, company.getEmail());
-			create.setString(1, company.getPassword());
+			create.setString(3, company.getPassword());
 			create.execute();
 		} catch (SQLException e) {
 			throw new CompanyException("error in creating company", e, company);

@@ -21,6 +21,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 
 public class CouponDBDAO implements ElementDAO<Coupon> {
 	private static String sqlCreate = 		 "insert into coupons "
@@ -58,14 +59,12 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		
 		connect();
 		try (PreparedStatement create = connection.prepareStatement(sqlCreate)) {
-			java.sql.Date startDate = (Date) coupon.getStartDate();
-			java.sql.Date endDate = (Date) coupon.getEndDate();
 			create.setInt(1, coupon.getCompanyId());
-			create.setInt(2, coupon.getCategoryId());
+			create.setInt(2, reverseCategoryDictionary.get(coupon.getCategory()));
 			create.setString(3, coupon.getTitle());
 			create.setString(4, coupon.getDescription());
-			create.setDate(5, startDate);
-			create.setDate(6, endDate);
+			create.setDate(5, Date.valueOf(coupon.getStartDate()));
+			create.setDate(6, Date.valueOf(coupon.getEndDate()));
 			create.setInt(7, coupon.getAmount());
 			create.setDouble(8, coupon.getPrice());
 			create.setString(9, coupon.getImage());
@@ -102,13 +101,15 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		result = new Coupon();
 
 		int amount = rs.getInt("amount");
+		int companyId = rs.getInt("company_id");
 		String title = rs.getString("title");
 		String description = rs.getString("description");
 		Category category = categoryDictionary.get(rs.getInt("category_id"));
 		double price = rs.getDouble("price");
-		Date startDate = rs.getDate("start_date");
-		Date endDate = rs.getDate("end_date");
+		LocalDate startDate = rs.getDate("start_date").toLocalDate();
+		LocalDate endDate = rs.getDate("end_date").toLocalDate();
 		String image = rs.getString("image");
+		result.setCompanyId(companyId);
 		result.setAmount(amount);
 		result.setCategory(category);
 		result.setCategoryId(reverseCategoryDictionary.get(category));
@@ -131,8 +132,8 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		connect();
 		try (PreparedStatement update = connection.prepareStatement(sqlUpdate)) {
 			update.setString(1, coupon.getTitle());
-			update.setDate(2, (Date) coupon.getStartDate());
-			update.setDate(3, (Date) coupon.getEndDate());
+			update.setDate(2, Date.valueOf(coupon.getStartDate()));
+			update.setDate(3,Date.valueOf(coupon.getEndDate()));
 			update.setInt(4, coupon.getAmount());
 			update.setInt(5, coupon.getCategoryId());
 			update.setString(6, coupon.getDescription());

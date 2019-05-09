@@ -5,7 +5,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 
 import com.sys.beans.Category;
 import com.sys.beans.Coupon;
@@ -91,7 +90,7 @@ public class CustomerFacade extends ClientFacade {
 			return customerDao.read(customer.getId());
 	}
 
-	private boolean isToday(Date couponDate) {
+	private boolean isToday(LocalDate couponDate) { // This is a mess. i should organize it TODO
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		LocalDate today = LocalDate.now();

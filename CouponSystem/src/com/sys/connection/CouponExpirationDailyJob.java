@@ -1,5 +1,6 @@
 package com.sys.connection;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -64,7 +65,7 @@ public class CouponExpirationDailyJob implements Runnable {
 	private void removeUnexpiredCouponsFromList() {
 		ZonedDateTime today = LocalDate.now().atStartOfDay(ZoneId.systemDefault());
 		for (int i = 0; i < expiredCoupons.size(); i++) {
-			if (expiredCoupons.get(i).getEndDate().before(Date.from(today.toInstant()))) {
+			if (expiredCoupons.get(i).getEndDate().isBefore(LocalDate.now(Clock.systemDefaultZone()))) {
 				expiredCoupons.remove(i--);
 			}
 		}

@@ -1,7 +1,7 @@
 //Ok
 package com.sys.beans;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class Coupon {
 	private int id,companyId,categoryId;
@@ -18,7 +18,7 @@ public class Coupon {
 	private Category category;
 
 	private double price;
-	private Date startDate, endDate;
+	private LocalDate startDate, endDate;
 	private String image;
 
 	@Override
@@ -108,19 +108,19 @@ public class Coupon {
 		this.price = price;
 	}
 
-	public Date getStartDate() {
+	public LocalDate getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(Date startDate) {
+	public void setStartDate(LocalDate startDate) {
 		this.startDate = startDate;
 	}
 
-	public Date getEndDate() {
+	public LocalDate getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(Date endDate) {
+	public void setEndDate(LocalDate endDate) {
 		this.endDate = endDate;
 	}
 
@@ -143,7 +143,7 @@ public class Coupon {
 	}
 
 	public Coupon(int id, int companyId, int categoryId, int amount, String title, String description,
-			Category category, double price, Date startDate, Date endDate, String image) {
+			Category category, double price, LocalDate startDate, LocalDate endDate, String image) {
 		super();
 		this.id = id;
 		this.companyId = companyId;
