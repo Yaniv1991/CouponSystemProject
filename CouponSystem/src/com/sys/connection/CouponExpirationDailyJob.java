@@ -30,13 +30,13 @@ public class CouponExpirationDailyJob implements Runnable {
 		while (!quit) {
 			try {
 				expiredCoupons = (List<Coupon>) couponDao.readAll();
-				System.out.println(expiredCoupons);
+//				System.out.println(expiredCoupons);
 				removeUnexpiredCouponsFromList();
 				System.out.println(expiredCoupons);
 				removeExpiredCouponsFromDB();
-				if (allCouponsWereDeleted()) {
-					expiredCoupons.clear();
-				}
+//				if (allCouponsWereDeleted()) {
+//					expiredCoupons.clear();
+//				}
 				
 				Thread.sleep(sleepTime);
 			} catch (CouponSystemException | InterruptedException e) {
@@ -69,12 +69,13 @@ public class CouponExpirationDailyJob implements Runnable {
 
 	private void removeUnexpiredCouponsFromList() {
 		for (int i = 0; i < expiredCoupons.size(); i++) {
-			if (expiredCoupons.get(i).getEndDate().isBefore(LocalDate.now(Clock.systemDefaultZone()))) {
-				System.out.println(expiredCoupons.get(i).getEndDate() +  "is before " + LocalDate.now(Clock.systemDefaultZone()));
+			if (expiredCoupons.get(i).getEndDate().isAfter(LocalDate.now(Clock.systemDefaultZone()))) {
+//				System.out.println(expiredCoupons.get(i).getEndDate() +  "is after" + LocalDate.now(Clock.systemDefaultZone()));
 				expiredCoupons.remove(i);
 				i--;
 			}
 		}
+		System.out.print(expiredCoupons.size());
 	}
 
 	public void stop() {
