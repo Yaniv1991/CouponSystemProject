@@ -30,7 +30,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 	private static String sqlRead = "select * from coupons where id = ?";
 
 	private static String sqlUpdate = "update coupons set " + "title = ?, Start_date = ?, end_date = ?,"
-			+ "amount = ? , category = ? , description = ?,"  + "company_id = ? , category_id = ? ,"+ "price = ? ,image = ? where id = ?";
+			+ "amount = ? , description = ?,"  + "company_id = ? , category_id = ? ,"+ "price = ? ,image = ? where id = ?";
 
 	private static String sqlDelete = "delete from coupons where id = ?";
 	
@@ -78,12 +78,11 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 
 	@Override
 	public Coupon read(int id) throws CouponException {
-		// ("select * from ? where id = ?")
+		// ("select * from coupons where id = ?")
 		Coupon result = null;
 		connect();
 		try (PreparedStatement read = connection.prepareStatement(sqlRead)) {
-			read.setString(1, "coupon");
-			read.setInt(2, id);
+			read.setInt(1, id);
 			ResultSet rs = read.executeQuery();
 			if (rs.next()) {
 				result = readFromActiveConnection(id, rs);
@@ -127,7 +126,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 	public void update(Coupon coupon) throws CouponException {
 
 //		"update coupons set " + "title = ?, Start_date = ?, end_date = ?,"
-//				+ "amount = ? , category = ? , description = ?,"  + "company_id = ? , category_id = ? ,"+ "price = ? ,image = ? where id = ?"
+//				+ "amount = ? ,  description = ?,"  + "company_id = ? , category_id = ? ,"+ "price = ? ,image = ? where id = ?"
 
 		connect();
 		try (PreparedStatement update = connection.prepareStatement(sqlUpdate)) {
@@ -135,13 +134,12 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 			update.setDate(2, Date.valueOf(coupon.getStartDate()));
 			update.setDate(3,Date.valueOf(coupon.getEndDate()));
 			update.setInt(4, coupon.getAmount());
-			update.setInt(5, coupon.getCategoryId());
-			update.setString(6, coupon.getDescription());
-			update.setInt(7, coupon.getCompanyId());
-			update.setInt(8, coupon.getCategoryId());
-			update.setDouble(9, coupon.getPrice());
-			update.setString(10, coupon.getImage());
-			update.setInt(11, coupon.getId());
+			update.setString(5, coupon.getDescription());
+			update.setInt(6, coupon.getCompanyId());
+			update.setInt(7, coupon.getCategoryId());
+			update.setDouble(8, coupon.getPrice());
+			update.setString(9, coupon.getImage());
+			update.setInt(10, coupon.getId());
 			update.execute();
 		} catch (SQLException e) {
 			throw new CouponException("error in updating coupon " + coupon ,e);
@@ -243,7 +241,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 	public boolean exists(int customerId, int couponId) throws CouponException {
 		boolean result = false;
 		connect();
-		String preparedSql = "select * from customers_vs_coupons where customer_id = ? , coupon_id = ?";
+		String preparedSql = "select * from customers_vs_coupons where customer_id = ? AND coupon_id = ?";
 		try(PreparedStatement read = connection.prepareStatement(preparedSql)){
 			read.setInt(1, customerId);
 			read.setInt(2, couponId);
@@ -260,13 +258,36 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 	}
 
 	@Override
-	public void addPurchase(int couponId) throws CouponException {
+	public void addPurchase(int couponId,Customer customer) throws CouponException {
 		readAndIncrement(couponId,-1);
+		changeCustomersVsCoupons(couponId,customer,true);
 	}
 
+	private void changeCustomersVsCoupons(int couponId, Customer customer,boolean insertIntoTable) throws CouponException {
+		String sql;
+		if(insertIntoTable) {
+		sql	= "insert into customers_vs_coupons (coupon_id,customer_id) VALUES(?,?)";
+		}
+		else {
+			sql = "delete from customers_vs_coupons WHERE coupon_id = ? AND customer_id = ?";
+		}
+		connect();
+		try(PreparedStatement insert = connection.prepareStatement(sql)){
+			insert.setInt(1, couponId);
+			insert.setInt(2, customer.getId());
+			insert.execute();
+		} catch (SQLException e) {
+			throw new CouponException("error in inserting data to customers_vs_coupons",e);
+		}
+		finally {disconnect();}
+	}
+	
+	
+
 	@Override
-	public void deletePurchase(int couponId) throws CouponException {
+	public void deletePurchase(int couponId,Customer customer) throws CouponException {
 		readAndIncrement(couponId, 1);
+		changeCustomersVsCoupons(couponId, customer, false);
 		}
 	
 	private void readAndIncrement(int couponId,int increment) throws CouponException {

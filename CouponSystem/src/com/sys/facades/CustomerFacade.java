@@ -36,7 +36,10 @@ public class CustomerFacade extends ClientFacade {
 
 	public void purchaseCoupon(int couponId) throws CouponException {
 		Coupon coupon = couponDao.read(couponId);
-		if (couponDao.exists(customer.getId(), coupon.getId())) {
+		if(coupon == null) {
+			throw new CouponException("Coupon does not exist");
+		}
+		if (couponDao.exists(customer.getId(), couponId)) {
 			throw new CouponException("Customer already purchased this coupon");
 		}
 		if (coupon.getAmount() == 0) {
@@ -45,7 +48,8 @@ public class CustomerFacade extends ClientFacade {
 		if (isToday(coupon.getEndDate())) {
 			throw new CouponException("Coupon has expired");
 		}
-		couponDao.addPurchase(coupon.getId());
+		couponDao.addPurchase(coupon.getId(),customer);
+		
 	}
 
 	public Collection<Coupon> getAllCopouns()throws CouponSystemException {

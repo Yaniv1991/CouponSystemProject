@@ -22,6 +22,7 @@ import com.sys.facades.LoginManager;
 
 public class TesterUI {
 	private final Scanner in = new Scanner(System.in);
+	private Thread job;
 	private CouponExpirationDailyJob dailyJob = new CouponExpirationDailyJob();
 
 	private ClientFacade facade;
@@ -356,12 +357,13 @@ public class TesterUI {
 	private void exit() {
 		quit = true;
 		dailyJob.stop();
+		job.interrupt();
 	}
 
 	private void startProgram() {
 		hasStarted = true;
 
-		Thread job = new Thread(dailyJob);
+		job = new Thread(dailyJob);
 		job.start();
 	}
 

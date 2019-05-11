@@ -43,7 +43,7 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 			throw new CustomerException("Password or Email were empty");
 		}
 		try (Statement stmt = connection.createStatement()) {
-			String sql = "select * from customers where email = '" + email + "'" + " , password = '" + password + "'";
+			String sql = "select * from customers where email = '" + email + "'" + " AND password = '" + password + "'";
 			ResultSet rs = stmt.executeQuery(sql);
 			result = rs.next();
 		} catch (SQLException e) {
@@ -76,6 +76,9 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 	@Override
 	public Customer read(int id) throws CustomerException {
 		// "select * from customers where id = ?"
+		if(id == -1) {
+			return null;
+		}
 		Customer result = null;
 		try {
 			connect();
@@ -193,6 +196,7 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 
 	@Override
 	public int getIdByEmail(String email) throws CustomerException {
+		connect();
 		int id = -1;
 		try (Statement stmt = connection.createStatement()) {
 			String sql = "select * from customers where email = '" + email + "'";
@@ -204,9 +208,6 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 			throw new CustomerException("error in getting customer id by email", e);
 		} finally {
 			disconnect();
-		}
-		if (id == -1) {
-			throw new CustomerException("email not found");
 		}
 
 		return id;
