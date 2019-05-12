@@ -6,9 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import com.sys.beans.Category;
-import com.sys.connection.ConnectionPool;
 import com.sys.dao.CategoryDBDAO;
-import com.sys.exception.ConnectionException;
 import com.sys.exception.CouponException;
 import com.sys.exception.CouponSystemException;
 
@@ -193,15 +191,14 @@ public class SingleUseMethods {
 	 * Closes the connection.
 	 * @throws SQLException
 	 */
-	private static void disconnect() throws SQLException {
-//		try {
-//			ConnectionPool.getInstance().restoreConnection(connection);
-//		} catch (ConnectionException e) {
-//			throw new CouponException("error in disconnecting", e);
-//		}
-//		connection = null;
-//	} 
-		connection.close();
+	private static void disconnect() throws CouponSystemException {
+
+		try {
+			connection.close();
+		} catch (SQLException e) {
+			throw new CouponSystemException("error in closing connection",e);
+		}
 		connection = null;
+		
 	}
 }
