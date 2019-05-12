@@ -6,10 +6,9 @@ import com.sys.exception.CouponSystemException;
 
 /**
  * 
+ * * DAO general interface.
  * @authors Gil Gouetta & Yaniv Chen
  * 
- * DAO general interface.
- *
  * @param <T>
  */
 

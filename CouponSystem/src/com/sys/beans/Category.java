@@ -3,8 +3,9 @@
 package com.sys.beans;
 /**
  * 
+ * ENUM for Coupon Category.
+ * 
  * @authors Yaniv Chen & Gil Gouetta
- * This is the ENUM for Coupon Category
  *
  */
 public enum Category {

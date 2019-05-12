@@ -13,9 +13,9 @@ import com.sys.exception.CouponSystemException;
 
 /**
  * 
- * @authors Yaniv Chen & Gil Gouetta.
- * 
  * Creates the daily job for the DB that deletes expired coupons.
+ * 
+ * @authors Yaniv Chen & Gil Gouetta.
  *
  */
 

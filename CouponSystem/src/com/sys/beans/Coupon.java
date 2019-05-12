@@ -5,10 +5,12 @@ import java.util.Date;
 
 /**
  * 
+ * Coupon javabean class.<br>
+ * Contains getters and setters for all attributes,<br>
+ * and the methods {@code toString} and {@code equals} (as well as {@code hashCode} for the equals method).
+ * 
  * @authors Yaniv Chen & Gil Gouetta
  * 
- * This is The Coupon javabean class.
- *
  */
 
 

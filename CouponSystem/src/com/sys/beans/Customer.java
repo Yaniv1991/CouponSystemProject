@@ -5,9 +5,11 @@ import java.util.List;
 
 /**
  * 
- * @authors Yaniv Chen & Gil Gouetta
+ * Customer javabean class.<br>
+ * Contains getters and setters for all attributes,<br>
+ * and the methods {@code toString} and {@code equals} (as well as {@code hashCode} for the equals method).
  * 
- * This is The Customer javabean class.
+ * @authors Yaniv Chen & Gil Gouetta
  *
  */
 

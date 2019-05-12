@@ -90,7 +90,6 @@ public class ConnectionPool {
  * Returns a {@code connection} to the pool.</br>	
  * @param connection
  */
-
 	public synchronized void restoreConnection(Connection connection) {
 		connections.add(connection);
 		notify();
@@ -102,7 +101,6 @@ public class ConnectionPool {
  * @return {@code connection} instance.
  * @throws ConnectionException
  */
-	
 	public synchronized Connection getConnection() throws ConnectionException {
 		if (poolIsClosing) {
 			throw new ConnectionException("Pool is closing");

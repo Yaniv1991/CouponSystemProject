@@ -2,8 +2,9 @@ package com.sys.beans;
 
 /**
  * 
+ * ENUM for customer type.
+ * 
  * @authors Yaniv Chen & Gil Gouetta
- * Cutmoer Type ENUM
  *
  */
 public enum CustomerType {

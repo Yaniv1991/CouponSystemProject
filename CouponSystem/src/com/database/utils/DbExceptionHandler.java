@@ -11,9 +11,8 @@ import java.util.Date;
 
 /**
  * 
- * @authors Yaniv Chen & Gil Gouetta.
- * 
  * Exception handler class for DB interactions.
+ * @authors Yaniv Chen & Gil Gouetta.
  *
  */
 public class DbExceptionHandler {
@@ -29,7 +28,6 @@ public class DbExceptionHandler {
  * 
  * @param e - the exception to handle.
  *
- * 
  */
 	public static void HandleException(Exception e)  {
 		logToFile(e);
@@ -50,8 +48,6 @@ public class DbExceptionHandler {
  * Creates a log file for DB Exceptions, using the exception.
  * 
  * @param e - the exception to log
- * 
- *  
  * 
  */
 	private static void logToFile(Exception e) {

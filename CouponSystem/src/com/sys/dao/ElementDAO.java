@@ -5,9 +5,8 @@ import com.sys.exception.CouponSystemException;
 
 /**
  * 
- * @authors Gil Gouetta & Yaniv Chen.
- * 
  * General DAO class for element (Non-User) objects.
+ * @authors Gil Gouetta & Yaniv Chen.
  *
  * @param General object type.
  */
