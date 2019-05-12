@@ -54,13 +54,15 @@ public class CouponExpirationDailyJob implements Runnable {
 //				}
 				
 				Thread.sleep(sleepTime);
-			} catch (CouponSystemException | InterruptedException e) {
+			} catch (InterruptedException e) {
 				if(quit) {
 					System.out.println("Thread ended safely");
 				}
 				else {
 				DbExceptionHandler.HandleException(e);
 				continue;}
+			} catch (CouponSystemException e) {
+				DbExceptionHandler.HandleException(e);
 			}
 		}
 	}
@@ -87,16 +89,7 @@ public class CouponExpirationDailyJob implements Runnable {
 	 * @return True if the list of coupons to delete is empty, False otherwise.
 	 * @throws CouponSystemException
 	 */
-	private boolean allCouponsWereDeleted() throws CouponSystemException {
-
-		for (Coupon expiredCoupon : expiredCoupons) {
-				if (couponDao.read(expiredCoupon.getId()) != null) {
-					return false;
-			}
-		}
-
-		return true;
-	}
+	
 
 	/**
 	 * {@code removeUnexpiredCouponsFromList}</br></br>
