@@ -149,18 +149,22 @@ public class TesterUI {
 				}
 				
 				case "get all coupons": {
-					readList(facade.getAllCopounsOfCustomer());
+					readList(facade.getAllCoupons());
+					break;
+				}
+				case "get all coupons of customer": {
+					readList(facade.getAllCouponsOfCustomer());
 					break;
 				}
 				case "get coupons by category": {
-					readList(facade.getAllCopounsByCategory(selectCategory()));
+					readList(facade.getAllCouponsByCategory(selectCategory()));
 					break;
 				}
 				case "get coupons by max price": {
-					readList(facade.getAllCopounsByMaxPrice(readDouble("coupon max price")));
+					readList(facade.getAllCouponsByMaxPrice(readDouble("coupon max price")));
 					break;
 				}
-				case "get company details": {
+				case "get customer details": {
 					System.out.println(facade.getCustomerDetails());
 					break;
 				}
@@ -388,6 +392,7 @@ public class TesterUI {
 		if (facade instanceof CustomerFacade) {
 			options.add("purchase coupon");
 			options.add("get all coupons");
+			options.add("get all coupons of customer");
 			options.add("get coupons by category");
 			options.add("get coupons by max price");
 			options.add("get customer details");

@@ -30,7 +30,7 @@ public class CompanyDBDAO implements UserDAO<Company> {
 	private static String sqlCreate = "insert into companies (name,email,password) values(?,?,?)";
 	private static String sqlRead = "select * from companies where id = ?";
 	private static String sqlUpdate = "update companies set name = ?,password = ?,email = ? where id = ?";
-	private static String sqlDelete = "delete * from companies where id = ?";
+	private static String sqlDelete = "delete from companies where id = ?";
 
 	private CouponDBDAO couponDao;
 	public CompanyDBDAO(CouponDBDAO couponDao) {

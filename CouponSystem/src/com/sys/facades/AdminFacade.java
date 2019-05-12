@@ -82,6 +82,7 @@ private CouponDBDAO couponDao;
 	 */
 	public void removeCompany(Company company) throws CouponException, CompanyException {
 		for (Coupon coupon : company.getCoupons()) {
+			couponDao.deleteAllFromHistory(coupon.getId());
 			couponDao.delete(coupon.getId());
 		}
 		companyDao.delete(company.getId());

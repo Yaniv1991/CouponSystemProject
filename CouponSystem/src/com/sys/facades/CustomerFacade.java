@@ -69,7 +69,7 @@ public class CustomerFacade extends ClientFacade {
 	 * @return a Collection of {@link com.sys.beans.Coupon Coupon} objects.
 	 * @throws CouponSystemException
 	 */
-	public Collection<Coupon> getAllCopouns()throws CouponSystemException {
+	public Collection<Coupon> getAllCoupons()throws CouponSystemException {
 		return couponDao.readAll();
 	}
 	
@@ -78,7 +78,7 @@ public class CustomerFacade extends ClientFacade {
 	 * @return a Collection of {@link com.sys.beans.Coupon Coupon} objects.
 	 * @throws CouponSystemException
 	 */
-	public Collection<Coupon> getAllCopounsOfCustomer()throws CouponSystemException {
+	public Collection<Coupon> getAllCouponsOfCustomer()throws CouponSystemException {
 		return couponDao.readAll(customer);
 	}
 
@@ -88,7 +88,7 @@ public class CustomerFacade extends ClientFacade {
 	 * @return a Collection of {@link com.sys.beans.Coupon Coupon} objects.
 	 * @throws CouponException
 	 */
-	public Collection<Coupon> getAllCopounsByMaxPrice(double maxPrice) throws CouponException {
+	public Collection<Coupon> getAllCouponsByMaxPrice(double maxPrice) throws CouponException {
 		Collection<Coupon> coupons = new ArrayList<Coupon>();
 		Collection<Coupon> allCoupons = new ArrayList<Coupon>();
 		
@@ -107,7 +107,7 @@ public class CustomerFacade extends ClientFacade {
 	 * @return a Collection of {@link com.sys.beans.Coupon Coupon} objects.
 	 * @throws CustomerException
 	 */
-	public Collection<Coupon> getAllCopounsByCategory(Category category) throws CustomerException {
+	public Collection<Coupon> getAllCouponsByCategory(Category category) throws CustomerException {
 
 		Collection<Coupon> coupons = new ArrayList<Coupon>();
 		Collection<Coupon> allCoupons = new ArrayList<Coupon>();

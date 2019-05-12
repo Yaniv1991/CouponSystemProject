@@ -24,50 +24,55 @@ import java.sql.Statement;
 import java.time.LocalDate;
 
 /**
- * DAO objects to handle Coupons table in the DB and {@link com.sys.beans.Coupon Coupon} java bean.<br>
+ * DAO objects to handle Coupons table in the DB and {@link com.sys.beans.Coupon
+ * Coupon} java bean.<br>
  * Implements the {@link com.sys.dao.ElementDAO ElementDAO} interface.
+ * 
  * @authors Yaniv Chen & Gil Gouetta
  */
 
 public class CouponDBDAO implements ElementDAO<Coupon> {
-	private static String sqlCreate = 		 "insert into coupons "
-			+ "(company_id,category_id,title,description,start_date,end_date,amount,price,image) " + "values (?,?,?,?,?,?,?,?,?)";
+	private static String sqlCreate = "insert into coupons "
+			+ "(company_id,category_id,title,description,start_date,end_date,amount,price,image) "
+			+ "values (?,?,?,?,?,?,?,?,?)";
 
 	private static String sqlRead = "select * from coupons where id = ?";
 
 	private static String sqlUpdate = "update coupons set " + "title = ?, Start_date = ?, end_date = ?,"
-			+ "amount = ? , description = ?,"  + "company_id = ? , category_id = ? ,"+ "price = ? ,image = ? where id = ?";
+			+ "amount = ? , description = ?," + "company_id = ? , category_id = ? ,"
+			+ "price = ? ,image = ? where id = ?";
 
 	private static String sqlDelete = "delete from coupons where id = ?";
-	
+
 	private static String sqlDeleteHistory = "delete from cutomers_vs_coupons where coupon_id = ?";
 	private static String sqlDeleteCustomerHistory = "delete from cutomers_vs_coupons where customer_id = ?";
 
-	
 	private Connection connection;
-	private Map<Integer,Category> categoryDictionary;
-	private Map<Category,Integer> reverseCategoryDictionary;
-	
+	private Map<Integer, Category> categoryDictionary;
+	private Map<Category, Integer> reverseCategoryDictionary;
+
 	/**
-	 * Generator for this DAO object, also used to establish the categoryDictionary and<br>
+	 * Generator for this DAO object, also used to establish the categoryDictionary
+	 * and<br>
 	 * reverseCategoryDictionary hash map objects.
+	 * 
 	 * @param categoryDao - a {@link com.sys.dao.CategoryDBDAO CtegoryDBDAO} object.
 	 */
 	public CouponDBDAO(CategoryDBDAO categoryDao) {
 		super();
 		this.categoryDictionary = categoryDao.allCategoriesById();
 		reverseCategoryDictionary = new HashMap<Category, Integer>();
-		for(int i = 0;i<categoryDictionary.size()-1;i++) {
-			reverseCategoryDictionary.put(categoryDictionary.get(i+1), i+1);
+		for (int i = 0; i < categoryDictionary.size() - 1; i++) {
+			reverseCategoryDictionary.put(categoryDictionary.get(i + 1), i + 1);
 		}
 	}
 
 	@Override
 	public void create(Coupon coupon) throws CouponException {
-		
+
 //		 "insert into coupons "
 //					+ "(company_id,category_id,title,description,start_date,end_date,amount,price,image) " + "values (?,?,?,?,?,?,?,?,?)"
-		
+
 		connect();
 		try (PreparedStatement create = connection.prepareStatement(sqlCreate)) {
 			create.setInt(1, coupon.getCompanyId());
@@ -82,9 +87,10 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 
 			create.execute();
 		} catch (SQLException e) {
-			throw new CouponException("error in creating coupon",e);
+			throw new CouponException("error in creating coupon", e);
+		} finally {
+			disconnect();
 		}
-		finally {disconnect();}
 	}
 
 	@Override
@@ -100,14 +106,17 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 			}
 
 		} catch (SQLException | CouponSystemException e) {
-			throw new CouponException("error in reading coupon",e);
+			throw new CouponException("error in reading coupon", e);
+		} finally {
+			disconnect();
 		}
-		finally {disconnect();}
 		return result;
 	}
 
 	/**
-	 * Returns a {@link com.sys.beans.Coupon Coupon} object using a result set from a DB query, and a coupon id.
+	 * Returns a {@link com.sys.beans.Coupon Coupon} object using a result set from
+	 * a DB query, and a coupon id.
+	 * 
 	 * @param id - Integer
 	 * @param rs - Result set
 	 * @return a {@link com.sys.beans.Coupon Coupon} object.
@@ -151,7 +160,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		try (PreparedStatement update = connection.prepareStatement(sqlUpdate)) {
 			update.setString(1, coupon.getTitle());
 			update.setDate(2, Date.valueOf(coupon.getStartDate()));
-			update.setDate(3,Date.valueOf(coupon.getEndDate()));
+			update.setDate(3, Date.valueOf(coupon.getEndDate()));
 			update.setInt(4, coupon.getAmount());
 			update.setString(5, coupon.getDescription());
 			update.setInt(6, coupon.getCompanyId());
@@ -161,7 +170,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 			update.setInt(10, coupon.getId());
 			update.execute();
 		} catch (SQLException e) {
-			throw new CouponException("error in updating coupon " + coupon ,e);
+			throw new CouponException("error in updating coupon " + coupon, e);
 		} finally {
 			disconnect();
 		}
@@ -174,7 +183,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 			delete.setInt(1, id);
 			delete.execute();
 		} catch (SQLException e) {
-			throw new CouponException("error in deleting coupon",e);
+			throw new CouponException("error in deleting coupon", e);
 		} finally {
 			disconnect();
 		}
@@ -192,7 +201,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 			}
 
 		} catch (SQLException | CouponSystemException e) {
-			throw new CouponException("error in reading all coupons",e);
+			throw new CouponException("error in reading all coupons", e);
 		} finally {
 			disconnect();
 		}
@@ -201,6 +210,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 
 	/**
 	 * Returns all coupons posted by a specific company.
+	 * 
 	 * @param company - a {@link com.sys.beans.Company Company} object.
 	 * @return a collection of {@link com.sys.beans.Coupon Coupon} objects.
 	 * @throws CouponException
@@ -216,7 +226,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 			}
 
 		} catch (SQLException | CouponSystemException e) {
-			throw new CouponException("Exception raised in reading all coupons",e);
+			throw new CouponException("Exception raised in reading all coupons", e);
 		} finally {
 			disconnect();
 		}
@@ -226,33 +236,35 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 
 	/**
 	 * Returns all coupons purchased by a specific customer.
+	 * 
 	 * @param customer - a {@link com.sys.beans.Customer Customer} object.
 	 * @return a collection of {@link com.sys.beans.Coupon Coupon} objects.
 	 * @throws CouponException
 	 */
-	public Collection<Coupon> readAll(Customer customer) throws CouponException{
+	public Collection<Coupon> readAll(Customer customer) throws CouponException {
 		List<Coupon> result = new ArrayList<Coupon>();
-		
+
 		connect();
-		String sql = "select * from customers_vs_coupons where customer_id = ?";
-		try(PreparedStatement read = connection.prepareStatement(sql)){
-			read.setInt(1, customer.getId());
-			ResultSet rs = read.executeQuery();
-			
-			while(rs.next()) {
-				result.add(readFromActiveConnection(rs.getInt("coupon_id"),rs));
+		String sql = "SELECT customers_vs_coupons.customer_id AS customer_id, coupons.* FROM customers_vs_coupons RIGHT JOIN coupons ON customers_vs_coupons.coupon_id = coupons.id"
+				+ " WHERE customers_vs_coupons.customer_id = ?";
+		try (PreparedStatement readFromCustomersVsCoupons = connection.prepareStatement(sql);) {
+			readFromCustomersVsCoupons.setInt(1, customer.getId());
+			ResultSet rs = readFromCustomersVsCoupons.executeQuery();
+			while (rs.next()) {
+				result.add(readFromActiveConnection(rs.getInt("id"), rs));
 			}
 		} catch (SQLException | CouponSystemException e) {
 			throw new CouponException("error in reading all coupons of customer", e);
-		}
-		finally {
+		} finally {
 			disconnect();
 		}
 		return result;
 	}
 
 	/**
-	 * Receives a connection from the {@link com.sys.connection.ConnectionPool ConnectionPool}
+	 * Receives a connection from the {@link com.sys.connection.ConnectionPool
+	 * ConnectionPool}
+	 * 
 	 * @throws CouponException
 	 */
 	private synchronized void connect() throws CouponException {
@@ -264,7 +276,9 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 	}
 
 	/**
-	 * Returns the connection to the {@link com.sys.connection.ConnectionPool ConnectionPool}
+	 * Returns the connection to the {@link com.sys.connection.ConnectionPool
+	 * ConnectionPool}
+	 * 
 	 * @throws CouponException
 	 */
 	private synchronized void disconnect() throws CouponException {
@@ -281,74 +295,78 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		boolean result = false;
 		connect();
 		String preparedSql = "select * from customers_vs_coupons where customer_id = ? AND coupon_id = ?";
-		try(PreparedStatement read = connection.prepareStatement(preparedSql)){
+		try (PreparedStatement read = connection.prepareStatement(preparedSql)) {
 			read.setInt(1, customerId);
 			read.setInt(2, couponId);
 			ResultSet rs = read.executeQuery();
 			result = rs.next();
-			
+
 		} catch (SQLException e) {
-			throw new CouponException("error in fetching coupon from customers_vs_coupons",e);
-		}
-		finally {
+			throw new CouponException("error in fetching coupon from customers_vs_coupons", e);
+		} finally {
 			disconnect();
 		}
 		return result;
 	}
 
 	@Override
-	public void addPurchase(int couponId,Customer customer) throws CouponException {
-		readAndIncrement(couponId,-1);
-		changeCustomersVsCoupons(couponId,customer,true);
+	public void addPurchase(int couponId, Customer customer) throws CouponException {
+		readAndIncrement(couponId, -1);
+		changeCustomersVsCoupons(couponId, customer, true);
 	}
 
 	/**
-	 * Makes the necessary changes in Customers_vs_Coupons table for a purchase or a refund/return.
+	 * Makes the necessary changes in Customers_vs_Coupons table for a purchase or a
+	 * refund/return.
+	 * 
 	 * @param couponId
-	 * @param customer a {@link com.sys.beans.Customer Customer} object.
-	 * @param insertIntoTable a boolean parameter to define if the command shall be "insert into" or "delete"
+	 * @param customer        a {@link com.sys.beans.Customer Customer} object.
+	 * @param insertIntoTable a boolean parameter to define if the command shall be
+	 *                        "insert into" or "delete"
 	 * @throws CouponException
 	 */
-	private void changeCustomersVsCoupons(int couponId, Customer customer,boolean insertIntoTable) throws CouponException {
+	private void changeCustomersVsCoupons(int couponId, Customer customer, boolean insertIntoTable)
+			throws CouponException {
 		String sql;
-		if(insertIntoTable) {
-		sql	= "insert into customers_vs_coupons (coupon_id,customer_id) VALUES(?,?)";
-		}
-		else {
+		if (insertIntoTable) {
+			sql = "insert into customers_vs_coupons (coupon_id,customer_id) VALUES(?,?)";
+		} else {
 			sql = "delete from customers_vs_coupons WHERE coupon_id = ? AND customer_id = ?";
 		}
 		connect();
-		try(PreparedStatement insert = connection.prepareStatement(sql)){
+		try (PreparedStatement insert = connection.prepareStatement(sql)) {
 			insert.setInt(1, couponId);
 			insert.setInt(2, customer.getId());
 			insert.execute();
 		} catch (SQLException e) {
-			throw new CouponException("error in inserting data to customers_vs_coupons",e);
+			throw new CouponException("error in inserting data to customers_vs_coupons", e);
+		} finally {
+			disconnect();
 		}
-		finally {disconnect();}
 	}
-	
-	
 
 	@Override
-	public void deletePurchase(int couponId,Customer customer) throws CouponException {
+	public void deletePurchase(int couponId, Customer customer) throws CouponException {
 		readAndIncrement(couponId, 1);
 		changeCustomersVsCoupons(couponId, customer, false);
-		}
-	
+	}
+
 	/**
-	 * Makes the appropriate increment in the {@code amount} field in the {@code Coupon} entry in the DB.<br>
-	 * Works for both purchase (increment will be -1) and return (increment will be +1)
-	 * @param couponId 
+	 * Makes the appropriate increment in the {@code amount} field in the
+	 * {@code Coupon} entry in the DB.<br>
+	 * Works for both purchase (increment will be -1) and return (increment will be
+	 * +1)
+	 * 
+	 * @param couponId
 	 * @param increment
 	 * @throws CouponException
 	 */
-	private void readAndIncrement(int couponId,int increment) throws CouponException {
+	private void readAndIncrement(int couponId, int increment) throws CouponException {
 		Coupon coupon = read(couponId);
-		coupon.setAmount(coupon.getAmount()+increment);
+		coupon.setAmount(coupon.getAmount() + increment);
 		update(coupon);
 	}
-	
+
 	@Override
 	public void deleteAllFromHistory(int couponId) throws CouponException {
 		try (PreparedStatement delete = connection.prepareStatement(sqlDeleteHistory)) {
@@ -358,15 +376,14 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 			throw new CouponException("error in deleting purchase history of coupons", e);
 		}
 	}
-	
-	//TODO remove purchases from the coupons so another can buy them
-	public void deleteCouponsOfCustomer(int customerId) 
-			throws CouponException{
+
+	// TODO remove purchases from the coupons so another can buy them
+	public void deleteCouponsOfCustomer(int customerId) throws CouponException {
 		try (PreparedStatement delete = connection.prepareStatement(sqlDeleteCustomerHistory)) {
-		delete.setInt(1, customerId);
-		delete.execute();
-	} catch (SQLException e) {
-		throw new CouponException("error in deleting history of customer", e);
-	}
+			delete.setInt(1, customerId);
+			delete.execute();
+		} catch (SQLException e) {
+			throw new CouponException("error in deleting history of customer", e);
+		}
 	}
 }
