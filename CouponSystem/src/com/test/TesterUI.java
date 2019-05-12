@@ -285,12 +285,14 @@ public class TesterUI {
 	private Category selectCategory() {
 		while(true) {
 		try {
+			System.out.println("please enter a category\n");
+			
 		for (Category category : Category.values()) {
 			System.out.println(category);
 		}
 		return Category.valueOf(in.nextLine().toUpperCase());}
 		catch(IllegalArgumentException e) {
-			System.out.println("please enter a valid category");
+			System.out.println("invalid input");
 		}}
 	}
 

@@ -44,8 +44,8 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 
 	private static String sqlDelete = "delete from coupons where id = ?";
 
-	private static String sqlDeleteHistory = "delete from cutomers_vs_coupons where coupon_id = ?";
-	private static String sqlDeleteCustomerHistory = "delete from cutomers_vs_coupons where customer_id = ?";
+	private static String sqlDeleteHistory = "delete from customers_vs_coupons where coupon_id = ?";
+	private static String sqlDeleteCustomerHistory = "delete from customers_vs_coupons where customer_id = ?";
 
 	private Connection connection;
 	private Map<Integer, Category> categoryDictionary;
@@ -367,14 +367,18 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		update(coupon);
 	}
 
+	
+	//TODO maybe it should be logically changed in a manner that removes the coupon's purchase from the customers
 	@Override
 	public void deleteAllFromHistory(int couponId) throws CouponException {
+		connect();
 		try (PreparedStatement delete = connection.prepareStatement(sqlDeleteHistory)) {
 			delete.setInt(1, couponId);
 			delete.execute();
 		} catch (SQLException e) {
 			throw new CouponException("error in deleting purchase history of coupons", e);
 		}
+		finally {disconnect();}
 	}
 
 	// TODO remove purchases from the coupons so another can buy them
