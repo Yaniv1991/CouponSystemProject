@@ -185,6 +185,7 @@ public class CompanyDBDAO implements UserDAO<Company> {
 
 	@Override
 	public int getIdByEmail(String email) throws CompanyException {
+		connect();
 		int id = -1;
 		try (Statement stmt = connection.createStatement()) {
 			String sql = "select id from companies where email = '" + email + "'";
@@ -192,13 +193,11 @@ public class CompanyDBDAO implements UserDAO<Company> {
 			if (rs.next()) {
 				id = rs.getInt("id");
 			}
-			disconnect();
+			
 		} catch (SQLException e) {
 			throw new CompanyException("error in getting company id", e);
 		}
-		if (id == -1) {
-			throw new CompanyException("email not found");
-		}
+		finally {disconnect();}
 
 		return id;
 	}

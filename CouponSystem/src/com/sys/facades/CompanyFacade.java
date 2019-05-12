@@ -1,6 +1,7 @@
 package com.sys.facades;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import com.sys.beans.Category;
 import com.sys.beans.Company;
@@ -13,6 +14,10 @@ import com.sys.exception.CouponSystemException;
 public class CompanyFacade extends ClientFacade{
 
 	private Company company;
+	public Company getCompany() {
+		return company;
+	}
+
 	private CompanyDBDAO companyDao;
 	private CouponDBDAO couponDao;
 	public CompanyFacade(int id,CompanyDBDAO companyDao,CouponDBDAO couponDao) {
@@ -53,8 +58,12 @@ public class CompanyFacade extends ClientFacade{
 			couponDao.delete(coupon.getId());
 	}
 	
-	public List<Coupon> returnAllCoupons () throws CouponException {
-		return (List<Coupon>)couponDao.readAll(company);
+	public Coupon read(int couponId) throws CouponException {
+		return couponDao.read(couponId);
+	}
+	
+	public Collection<Coupon> returnAllCoupons () throws CouponException {
+		return couponDao.readAll(company);
 	}
 	
 	public List<Coupon> returnAllCouponsByCategory (Category category) throws CouponException {

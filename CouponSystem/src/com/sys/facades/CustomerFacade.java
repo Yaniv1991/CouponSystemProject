@@ -20,6 +20,10 @@ import com.sys.exception.CustomerException;
 public class CustomerFacade extends ClientFacade {
 
 	private Customer customer;
+	public Customer getCustomer() {
+		return customer;
+	}
+
 	private CouponDBDAO couponDao;
 	private CustomerDBDAO customerDao;
 
@@ -48,7 +52,11 @@ public class CustomerFacade extends ClientFacade {
 		couponDao.addPurchase(coupon.getId());
 	}
 
-	public Collection<Coupon> getAllCopouns(int customerId) throws CouponSystemException {
+	public Collection<Coupon> getAllCopouns()throws CouponSystemException {
+		return couponDao.readAll();
+	}
+	
+	public Collection<Coupon> getAllCopounsOfCustomer()throws CouponSystemException {
 		return couponDao.readAll(customer);
 	}
 
@@ -82,8 +90,8 @@ public class CustomerFacade extends ClientFacade {
 		return coupons;
 	}
 
-	public Customer getCustomerDetails(String email) throws CustomerException {
-			return customerDao.read(customerDao.getIdByEmail(email));
+	public Customer getCustomerDetails() throws CustomerException {
+			return customerDao.read(customer.getId());
 	}
 
 	private boolean isToday(Date couponDate) {

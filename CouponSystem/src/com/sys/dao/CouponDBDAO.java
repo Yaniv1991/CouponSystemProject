@@ -53,7 +53,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 			create.setDate(5, endDate);
 			create.setInt(6, coupon.getAmount());
 			create.setString(7, coupon.getCouponType().toString());
-			create.setString(8, coupon.getMessage());
+			create.setString(8, coupon.getDescription());
 			create.setDouble(9, coupon.getPrice());
 			create.setString(10, coupon.getImage());
 
@@ -90,7 +90,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 
 		int amount = rs.getInt("amount");
 		String title = rs.getString("title");
-		String message = rs.getString("message");
+		String description = rs.getString("description");
 		Category type = Category.valueOf(rs.getString("type"));
 		double price = rs.getDouble("price");
 		Date startDate = rs.getDate("start_date");
@@ -102,7 +102,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		result.setStartDate(startDate);
 		result.setId(id);
 		result.setImage(image);
-		result.setMessage(message);
+		result.setDescription(description);
 		result.setPrice(price);
 		result.setTitle(title);
 		return result;
