@@ -12,6 +12,14 @@ import com.sys.exception.ConnectionException;
 import com.sys.exception.CouponException;
 import com.sys.exception.CouponSystemException;
 
+/**
+ * 
+ * {@code SingleUseMethods}<br>
+ * Contains methods to create the DB, tables and everything needed to run the coupon system.
+ * @authors Gil Gouetta & Yaniv Chen
+ *
+ */
+
 public class SingleUseMethods {
 
 	private static Connection connection;
@@ -28,6 +36,11 @@ public class SingleUseMethods {
 
 	}
 
+	/**
+	 * {@code createTables}<br>
+	 * Creates all the tables (Customers, Companies, Categories and Customers_vs_Coupons).
+	 * @throws CouponSystemException
+	 */
 	private static void createTables() throws CouponSystemException {
 		try {
 			connect();
@@ -56,6 +69,11 @@ public class SingleUseMethods {
 
 	}
 
+	/**
+	 * {@code creataCompanyTable}<br>
+	 * Creates the {@code Companies} table.
+	 * @throws SQLException
+	 */
 	private static void createCompanyTable() throws SQLException {
 		// TODO Auto-generated method stub
 		String sql = "create table companies (id integer generated always as identity(start with 1, increment by 1),"
@@ -65,6 +83,11 @@ public class SingleUseMethods {
 		}
 	}
 
+	/**
+	 * {@code creataCategoryTable}<br>
+	 * Creates the {@code Categories} table.
+	 * @throws SQLException
+	 */
 	private static void createCategoryTable() throws SQLException {
 		// TODO Auto-generated method stub
 		String sql = "create table categories (id integer generated always as identity(start with 1, increment by 1),"
@@ -74,6 +97,11 @@ public class SingleUseMethods {
 		}
 	}
 
+	/**
+	 * {@code creataCustomerTable}<br>
+	 * Creates the {@code Customers} table.
+	 * @throws SQLException
+	 */
 	private static void createCustomerTable() throws SQLException {
 		// TODO Auto-generated method stub
 		String sql = "create table customers (id integer generated always as identity(start with 1, increment by 1),"
@@ -83,6 +111,11 @@ public class SingleUseMethods {
 		}
 	}
 
+	/**
+	 * {@code creataCouponTable}<br>
+	 * Creates the {@code Coupons} table.
+	 * @throws SQLException
+	 */
 	private static void createCouponTable() throws SQLException {
 		// TODO Auto-generated method stub
 		String sql = "create table coupons(id integer GENERATED ALWAYS AS IDENTITY(START WITH 1, INCREMENT BY 1)"
@@ -95,6 +128,11 @@ public class SingleUseMethods {
 		}
 	}
 
+	/**
+	 * {@code CustomersVsCouponsTable}<br>
+	 * Creates the {@code Customers_vs_Coupons} table.
+	 * @throws SQLException
+	 */
 	private static void createCustomersVsCouponsTable() throws SQLException {
 		// TODO Auto-generated method stub
 		String sql = "create table customers_vs_coupons (customer_id integer ,"
@@ -104,6 +142,11 @@ public class SingleUseMethods {
 		}
 	}
 
+	/**
+	 * {@code createCategories}<br>
+	 * Inserts the different categories into the {@code Categories} table.
+	 * @throws CouponSystemException
+	 */
 	private static void createCategories() throws CouponSystemException {
 		CategoryDBDAO categoryDao = new CategoryDBDAO();
 //		if (categoryDao.readAll().size() == 0) {
@@ -131,6 +174,11 @@ public class SingleUseMethods {
 //		}
 	}
 
+	/**
+	 * {@code connect}<br>
+	 * Creates a connection instance to the DB.
+	 * @throws CouponException
+	 */
 	private static synchronized void connect() throws CouponException {
 		try {
 			connection = DriverManager.getConnection(url);
@@ -139,12 +187,21 @@ public class SingleUseMethods {
 		}
 	}
 
-	private static void disconnect() throws CouponException {
-		try {
-			ConnectionPool.getInstance().restoreConnection(connection);
-		} catch (ConnectionException e) {
-			throw new CouponException("error in disconnecting", e);
-		}
+	/**
+	 * 
+	 * {@code disconnect}<br>
+	 * Closes the connection.
+	 * @throws SQLException
+	 */
+	private static void disconnect() throws SQLException {
+//		try {
+//			ConnectionPool.getInstance().restoreConnection(connection);
+//		} catch (ConnectionException e) {
+//			throw new CouponException("error in disconnecting", e);
+//		}
+//		connection = null;
+//	} 
+		connection.close();
 		connection = null;
 	}
 }

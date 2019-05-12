@@ -17,6 +17,12 @@ import com.sys.exception.ConnectionException;
 import com.sys.exception.CouponException;
 import com.sys.exception.CustomerException;
 
+/**
+ * DAO object to handle Customers table in the DB and {@link com.sys.beans.Customer Customer} java bean.<br>
+ * Implements the {@link com.sys.dao.UserDAO UserDAO} interface.
+ * @authors Gil Gouetta & Yaniv Chen
+ *
+ */
 public class CustomerDBDAO implements UserDAO<Customer> {
 
 	private Connection connection;
@@ -145,6 +151,10 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 		return result;
 	}
 
+	/**
+	 * Receives a connection from the {@link com.sys.connection.ConnectionPool ConnectionPool}
+	 * @throws CouponException
+	 */
 	private synchronized void connect() throws CustomerException {
 		if (connection == null) {
 			try {
@@ -155,6 +165,10 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 		}
 	}
 
+	/**
+	 * Returns the connection to the {@link com.sys.connection.ConnectionPool ConnectionPool}
+	 * @throws CouponException
+	 */
 	private synchronized void disconnect() throws CustomerException {
 		try {
 			ConnectionPool.getInstance().restoreConnection(connection);
@@ -164,6 +178,13 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 		connection = null;
 	}
 
+	/**
+	 * Uses "select" clause to get a {@link com.sys.beans.Customer Customer} object from the DB<br>
+	 * with the customer id reference.
+	 * @param id - Customer id.
+	 * @return {@link com.sys.beans.Customer Customer} object
+	 * @throws CustomerException
+	 */
 	private Customer readFromConnection(int id) throws CustomerException {
 		Customer result = null;
 		try (PreparedStatement read = connection.prepareStatement(sqlRead)) {
@@ -179,6 +200,13 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 		return result;
 	}
 
+	/**
+	 * Returns a {@link com.sys.beans.Customer Customer} object by querying the DB.
+	 * @param id - Integer id for the object retrieved
+	 * @param rs - Result set
+	 * @return {@link com.sys.beans.Customer Customer} object
+	 * @throws CustomerException
+	 */
 	private Customer createCustomer(int id, ResultSet rs) throws CustomerException {
 		Customer result;
 		result = new Customer(id);

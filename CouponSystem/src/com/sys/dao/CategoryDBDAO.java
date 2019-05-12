@@ -16,6 +16,11 @@ import com.sys.exception.ConnectionException;
 import com.sys.exception.CouponException;
 import com.sys.exception.CouponSystemException;
 
+/**
+ * DAO objects to handle Categories table in the DB and {@link com.sys.beans.Category Category} java bean.
+ * @authors Yaniv Chen & Gil Gouetta
+ */
+
 public class CategoryDBDAO implements DAO<Category>{
 
 	private Connection connection;
@@ -48,12 +53,18 @@ public Category read(int categoryId) throws CouponSystemException {
 			category = Category.valueOf(result.getString("name"));
 		}
 	} catch (SQLException e) {
-		throw new CouponSystemException("error in creating category entry",e);
+		throw new CouponSystemException("error in reading category entry",e);
 	} finally {disconnect();
 	}
 	return category;
 }
 
+/**
+ * Fetches the ID for the category from the Categories table in the DB.
+ * @param category
+ * @return an Integers for the category ID in the categories table in the DB.
+ * @throws CouponSystemException
+ */
 public int getCategoryId(Category category) throws CouponSystemException {
 	int result = 1;
 	String sql = "select id from categories where name = ?";
@@ -83,10 +94,11 @@ public void delete(int categoryId) throws CouponSystemException {
 		delete.setInt(1, categoryId);;
 		delete.execute();
 	} catch (SQLException e) {
-		throw new CouponSystemException("error in creating category entry",e);
+		throw new CouponSystemException("error in deleting category entry",e);
 	} finally {disconnect();
 	}
 }
+
 
 @Override
 public Collection<Category> readAll() throws CouponSystemException {
@@ -98,6 +110,11 @@ public Collection<Category> readAll() throws CouponSystemException {
 	
 }
 
+/**
+ * {@code allCategoriesById}<br><br>
+ * Creates a HashMap assorted collection of categories and their respective id's.
+ * @return a HashMap collection of categories.
+ */
 public Map<Integer,Category> allCategoriesById(){
 	Map<Integer,Category> result = new HashMap<Integer,Category>();
 	for(int i = 0; i<Category.values().length;i++) {
@@ -106,7 +123,10 @@ public Map<Integer,Category> allCategoriesById(){
 	return result;
 }
 
-
+/**
+ * Receives a connection from the {@link com.sys.connection.ConnectionPool ConnectionPool}
+ * @throws CouponException
+ */
 private synchronized void connect() throws CouponException {
 	try {
 		connection = ConnectionPool.getInstance().getConnection();
@@ -115,6 +135,10 @@ private synchronized void connect() throws CouponException {
 	}
 }
 
+/**
+ * Returns the connection to the {@link com.sys.connection.ConnectionPool ConnectionPool}
+ * @throws CouponException
+ */
 private synchronized void disconnect() throws CouponException {
 	try {
 		ConnectionPool.getInstance().restoreConnection(connection);

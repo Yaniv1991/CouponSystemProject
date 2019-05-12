@@ -17,6 +17,12 @@ import com.sys.exception.CompanyException;
 import com.sys.exception.ConnectionException;
 import com.sys.exception.CouponException;
 
+/**
+ * DAO object to handle Companies table in the DB and {@link com.sys.beans.Company Company} java bean.<br>
+ * Implements the {@link com.sys.dao.UserDAO UserDAO} interface.
+ * @authors Gil Gouetta & Yaniv Chen
+ *
+ */
 public class CompanyDBDAO implements UserDAO<Company> {
 
 //	private ConnectionPool connectionPool = ConnectionPool.getInstance();
@@ -82,6 +88,13 @@ public class CompanyDBDAO implements UserDAO<Company> {
 		return result;
 	}
 
+	/**
+	 * Receives a company id and a result set and returns a complete {@link com.sys.beans.Company Company} object.
+	 * @param id Company id.
+	 * @param rs Result Set.
+	 * @return a {@link com.sys.beans.Company Company} object.
+	 * @throws CompanyException
+	 */
 	private Company readFromActiveConnection(int id, ResultSet rs) throws CompanyException {
 		Company result;
 		result = new Company(id);
@@ -148,6 +161,10 @@ public class CompanyDBDAO implements UserDAO<Company> {
 
 	}
 
+	/**
+	 * Receives a connection from the {@link com.sys.connection.ConnectionPool ConnectionPool}
+	 * @throws CouponException
+	 */
 	private synchronized void connect() throws CompanyException {
 		if (connection == null) {
 			try {
@@ -158,6 +175,10 @@ public class CompanyDBDAO implements UserDAO<Company> {
 		}
 	}
 
+	/**
+	 * Returns the connection to the {@link com.sys.connection.ConnectionPool ConnectionPool}
+	 * @throws CouponException
+	 */
 	private synchronized void disconnect() throws CompanyException {
 		try {
 			ConnectionPool.getInstance().restoreConnection(connection);
@@ -167,6 +188,12 @@ public class CompanyDBDAO implements UserDAO<Company> {
 		connection = null;
 	}
 
+	/**
+	 * Receives a company id and returns a {@link com.sys.beans.Company Company} object. 
+	 * @param id - Integer for company id.
+	 * @return a {@link com.sys.beans.Company Company} object.
+	 * @throws CompanyException
+	 */
 	private Company readFromActiveConnection(int id) throws CompanyException {
 		Company result = null;
 		try (PreparedStatement read = connection.prepareStatement(sqlRead)) {

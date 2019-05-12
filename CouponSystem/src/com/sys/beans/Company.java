@@ -5,6 +5,15 @@ package com.sys.beans;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 
+ * Company javabean class.<br>
+ * Contains getters and setters for all attributes,<br>
+ * and the methods {@code toString} and {@code equals} (as well as {@code hashCode} for the equals method).
+ * @authors Yaniv Chen & Gil Gouetta
+ *
+ */
+
 public class Company {
 private int id;
 private String name,password,email;

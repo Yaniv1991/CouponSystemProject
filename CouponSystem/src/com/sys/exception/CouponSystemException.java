@@ -1,5 +1,10 @@
 package com.sys.exception;
 
+/**
+ * {@code CouponSystemException} extends the class {@code Exception} and is used to manage
+ * custom exceptions for the system.
+ * @authors Yaniv Chen & Gil Gouetta
+ */
 public class CouponSystemException extends Exception{
 
 	

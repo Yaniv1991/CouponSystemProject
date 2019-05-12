@@ -2,6 +2,12 @@ package com.sys.exception;
 
 import com.sys.beans.Customer;
 
+/**
+ * {@code CustomerException} extends {@code CouponSystemException} for exceptions in the
+ * customer facade.
+ * @authors Yaniv Chen & Gil Gouetta
+ */
+
 public class CustomerException extends CouponSystemException {
 
 	private Customer customer;

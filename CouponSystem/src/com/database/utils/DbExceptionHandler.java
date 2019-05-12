@@ -9,13 +9,26 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-
+/**
+ * 
+ * Exception handler class for DB interactions.
+ * @authors Yaniv Chen & Gil Gouetta.
+ *
+ */
 public class DbExceptionHandler {
 	private static String fileName = "DBExceptionLogger";
 	private static String filePath = "D:\\Exceptions\\";
 	private static String fileExtension = ".txt";
 
-
+	/**
+	 * 
+	 * {@code HandleException}</br>
+	 * </br>
+	 * Using {@link #logToFile(Exception) logToFile} method to log the exception, this method handles exceptions in the coupon system.
+	 * 
+	 * @param e - the exception to handle.
+	 *
+	 */
 	public static void HandleException(Exception e)  {
 		logToFile(e);
 		if (e instanceof SQLException) {
@@ -29,6 +42,15 @@ public class DbExceptionHandler {
 
 	}
 
+	/**
+	 * 
+	 * {@code LogToFile} </br>
+	 * </br>
+	 * Creates a log file for DB Exceptions, using the exception.
+	 * 
+	 * @param e - the exception to log
+	 * 
+	 */
 	private static void logToFile(Exception e) {
 		String now = new SimpleDateFormat("HH:mm:ss").format(new Date());
 		StringBuilder sb = new StringBuilder(now);

@@ -13,10 +13,22 @@ import com.sys.dao.CouponDBDAO;
 import com.sys.exception.CouponSystemException;
 import com.sys.facades.LoginManager;
 
+/**
+ * 
+ * Creates the daily job for the DB that deletes expired coupons.
+ * 
+ * @authors Yaniv Chen & Gil Gouetta.
+ *
+ */
+
 public class CouponExpirationDailyJob implements Runnable {
 
 	private boolean quit = false;
 	private CouponDBDAO couponDao ;
+	
+	/**
+	 * Generator for the daily job.
+	 */
 	public CouponExpirationDailyJob() {
 		super();
 		this.couponDao = LoginManager.getInstance().getCouponDao();
@@ -25,6 +37,12 @@ public class CouponExpirationDailyJob implements Runnable {
 	private final long sleepTime = 86400000;
 	private List<Coupon> expiredCoupons;
 
+	/**
+	 * 
+	 * Implements {@code runnable} method {@code run()}.</br>
+	 * This Daily job is affectively running everyday while the system is up.
+	 * 
+	 */
 	@Override
 	public void run() {
 		while (!quit) {
@@ -50,12 +68,28 @@ public class CouponExpirationDailyJob implements Runnable {
 		}
 	}
 
+	/**
+	 * 
+	 * {@code removeExpiredCouponsFromDB}</br></br>
+	 * Removes expired coupons from the DB.</br>
+	 * Iterates through all coupons in the list, pulled from the DB, </br>
+	 * and "cleaned" using {@link #removeUnexpiredCouponsFromList() removeUnexpiredCouponsFromList} and deletes all of them.
+	 * 
+	 * @throws CouponSystemException
+	 */
 	private void removeExpiredCouponsFromDB() throws CouponSystemException {
 		for (Coupon expiredCoupon : expiredCoupons) {
 				couponDao.delete(expiredCoupon.getId());
 		}
 	}
 
+	/**
+	 * {@code allCouponsWereDeleted}</br></br>
+	 * Checks if all expired coupons were deleted.	
+	 * 
+	 * @return True if the list of coupons to delete is empty, False otherwise.
+	 * @throws CouponSystemException
+	 */
 	private boolean allCouponsWereDeleted() throws CouponSystemException {
 
 		for (Coupon expiredCoupon : expiredCoupons) {
@@ -67,6 +101,12 @@ public class CouponExpirationDailyJob implements Runnable {
 		return true;
 	}
 
+	/**
+	 * {@code removeUnexpiredCouponsFromList}</br></br>
+	 * Iterates through the list of coupons, pulled from the DB,</br>
+	 * and removes the ones that haven't expired.
+	 * 
+	 */
 	private void removeUnexpiredCouponsFromList() {
 		for (int i = 0; i < expiredCoupons.size(); i++) {
 			if (expiredCoupons.get(i).getEndDate().isAfter(LocalDate.now(Clock.systemDefaultZone()))) {
@@ -78,6 +118,11 @@ public class CouponExpirationDailyJob implements Runnable {
 		System.out.print(expiredCoupons.size());
 	}
 
+	/**
+	 * {@code stop}</br></br>
+	 * Stops the thread. Sets {@code quit} to true. 
+	 * 
+	 */
 	public void stop() {
 		quit = true;
 	}

@@ -15,7 +15,13 @@ import com.sys.exception.CouponException;
 import com.sys.exception.CouponSystemException;
 import com.sys.exception.CustomerException;
 
-//revised
+// REVISED
+/**
+ * 
+ * Facade consisting of actions available for a "Customer" type client of the coupon system.
+ * @authors Yaniv Chen & Gil Gouetta
+ *
+ */
 public class CustomerFacade extends ClientFacade {
 
 	private Customer customer;
@@ -34,6 +40,12 @@ public class CustomerFacade extends ClientFacade {
 		return (customerDao.exists(email, password));
 	}
 
+	/**
+	 * Allows the customer to purchase a single coupon.<br>
+	 * Updates all relevant tables in the DB.
+	 * @param couponId - Integer representing the id for the purchased coupon.
+	 * @throws CouponException
+	 */
 	public void purchaseCoupon(int couponId) throws CouponException {
 		Coupon coupon = couponDao.read(couponId);
 		if(coupon == null) {
@@ -52,14 +64,30 @@ public class CustomerFacade extends ClientFacade {
 		
 	}
 
+	/**
+	 * Returns a collection of all the coupons available in he system.
+	 * @return a Collection of {@link com.sys.beans.Coupon Coupon} objects.
+	 * @throws CouponSystemException
+	 */
 	public Collection<Coupon> getAllCopouns()throws CouponSystemException {
 		return couponDao.readAll();
 	}
 	
+	/**
+	 * Returns all the coupons purchased by the customer.
+	 * @return a Collection of {@link com.sys.beans.Coupon Coupon} objects.
+	 * @throws CouponSystemException
+	 */
 	public Collection<Coupon> getAllCopounsOfCustomer()throws CouponSystemException {
 		return couponDao.readAll(customer);
 	}
 
+	/**
+	 * Returns all the coupon purchased by the customer that are under the {@code maxPrice} limit.
+	 * @param maxPrice - Double.
+	 * @return a Collection of {@link com.sys.beans.Coupon Coupon} objects.
+	 * @throws CouponException
+	 */
 	public Collection<Coupon> getAllCopounsByMaxPrice(double maxPrice) throws CouponException {
 		Collection<Coupon> coupons = new ArrayList<Coupon>();
 		Collection<Coupon> allCoupons = new ArrayList<Coupon>();
@@ -73,6 +101,12 @@ public class CustomerFacade extends ClientFacade {
 		return coupons;
 	}
 
+	/**
+	 * Returns all the coupon purchased by the customer that are of the {@code category}.
+	 * @param category - a {link com.sys.beans.Category Category} ENUM value.
+	 * @return a Collection of {@link com.sys.beans.Coupon Coupon} objects.
+	 * @throws CustomerException
+	 */
 	public Collection<Coupon> getAllCopounsByCategory(Category category) throws CustomerException {
 
 		Collection<Coupon> coupons = new ArrayList<Coupon>();
@@ -90,15 +124,25 @@ public class CustomerFacade extends ClientFacade {
 		return coupons;
 	}
 
+	/**
+	 * Return all the details for the customer from the DB.
+	 * @return {@link com.sys.beans.Customer Customer} object
+	 * @throws CustomerException
+	 */
 	public Customer getCustomerDetails() throws CustomerException {
 			return customerDao.read(customer.getId());
 	}
 
-	private boolean isToday(LocalDate couponDate) { // This is a mess. i should organize it TODO
-
+	/**
+	 * Compares a date to today's date, returns true if the dates match.
+	 * @param compareDate - A date object to compare to "today's date" (Taken from system clock).
+	 * @return Boolean value: True - Coupon expire date is today, False - Coupon expire date is NOT today.
+	 */
+	private boolean isToday(LocalDate compareDate) { 
+		// This is a mess. i should organize it TODO
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		LocalDate today = LocalDate.now();
-		return (formatter.format(today).equals(formatter.format((TemporalAccessor) couponDate)));
+		return (formatter.format(today).equals(formatter.format((TemporalAccessor) compareDate)));
 	}
 
 }

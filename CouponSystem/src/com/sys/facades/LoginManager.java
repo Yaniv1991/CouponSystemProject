@@ -5,7 +5,11 @@ import com.sys.dao.CompanyDBDAO;
 import com.sys.dao.CouponDBDAO;
 import com.sys.dao.CustomerDBDAO;
 import com.sys.exception.CouponSystemException;
-
+/**
+ * Singleton class used to manage login requests to the DB.
+ * @authors Gil Gouetta & Yaniv Chen.
+ *
+ */
 public class LoginManager {
 
 	private CouponDBDAO couponDao;
@@ -42,6 +46,13 @@ public class LoginManager {
 		customerDao = new CustomerDBDAO(couponDao);
 	}
 
+	/**
+	 * Login method for the coupon system, returns the relevant facade according to the login details.
+	 * @param email String
+	 * @param password String
+	 * @return an instance of a {@link com.sys.facades.ClientFacade ClientFacade}
+	 * @throws CouponSystemException
+	 */
 	public ClientFacade login(String email, String password) throws CouponSystemException {
 
 		ClientFacade facade = null;

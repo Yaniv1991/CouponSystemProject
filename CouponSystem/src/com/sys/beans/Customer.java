@@ -3,6 +3,16 @@ package com.sys.beans;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 
+ * Customer javabean class.<br>
+ * Contains getters and setters for all attributes,<br>
+ * and the methods {@code toString} and {@code equals} (as well as {@code hashCode} for the equals method).
+ * 
+ * @authors Yaniv Chen & Gil Gouetta
+ *
+ */
+
 public class Customer {
 	private int id;
 	private String firstName,lastName, password,email;

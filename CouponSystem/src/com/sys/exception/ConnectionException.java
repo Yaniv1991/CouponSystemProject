@@ -2,6 +2,12 @@ package com.sys.exception;
 
 import java.sql.Connection;
 
+/**
+ * {@code ConnectionException} extends {@code CouponSystemException} and used for DB related
+ * exceptions.
+ * @authors Gil Gouetta & Yaniv Chen
+ */
+
 public class ConnectionException extends CouponSystemException{
 	/**
 	 * 

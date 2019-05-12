@@ -2,6 +2,12 @@ package com.sys.exception;
 
 import com.sys.beans.Coupon;
 
+/**
+ * {@code CouponException} extends {@code CouponSystemException} for exceptions in the
+ * coupon facade.
+ * @authors Yaniv Chen & Gil Gouetta
+ */
+
 public class CouponException extends CouponSystemException{
 
 	private  Coupon coupon;

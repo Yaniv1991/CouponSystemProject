@@ -2,6 +2,12 @@ package com.sys.exception;
 
 import com.sys.beans.Company;
 
+/**
+ * {@code CompanyException} extends {@code CouponSystemException} and is used for exceptions in
+ * the company facade.
+ * @authors Yaniv Chen & Gil Gouetta
+ */
+
 public class CompanyException extends CouponSystemException{
 private Company company;
 	

@@ -3,6 +3,16 @@ package com.sys.beans;
 
 import java.time.LocalDate;
 
+/**
+ * 
+ * Coupon javabean class.<br>
+ * Contains getters and setters for all attributes,<br>
+ * and the methods {@code toString} and {@code equals} (as well as {@code hashCode} for the equals method).
+ * 
+ * @authors Yaniv Chen & Gil Gouetta
+ * 
+ */
+
 public class Coupon {
 	private int id,companyId,categoryId;
 	public int getCategoryId() {
