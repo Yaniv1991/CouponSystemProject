@@ -1,8 +1,7 @@
 package com.sys.facades;
 
+import java.time.Clock;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -15,7 +14,6 @@ import com.sys.exception.CouponException;
 import com.sys.exception.CouponSystemException;
 import com.sys.exception.CustomerException;
 
-// REVISED
 /**
  * 
  * Facade consisting of actions available for a "Customer" type client of the coupon system.
@@ -57,7 +55,7 @@ public class CustomerFacade extends ClientFacade {
 		if (coupon.getAmount() == 0) {
 			throw new CouponException("Coupon out of stock");
 		}
-		if (isToday(coupon.getEndDate())) {
+		if (isTodayOrBefore(coupon.getEndDate())) {
 			throw new CouponException("Coupon has expired");
 		}
 		couponDao.addPurchase(coupon.getId(),customer);
@@ -136,13 +134,11 @@ public class CustomerFacade extends ClientFacade {
 	/**
 	 * Compares a date to today's date, returns true if the dates match.
 	 * @param compareDate - A date object to compare to "today's date" (Taken from system clock).
-	 * @return Boolean value: True - Coupon expire date is today, False - Coupon expire date is NOT today.
+	 * @return Boolean value: True - Coupon expire date is today or already expired, False - Coupon expire date is after today.
 	 */
-	private boolean isToday(LocalDate compareDate) { 
-		// This is a mess. i should organize it TODO
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		LocalDate today = LocalDate.now();
-		return (formatter.format(today).equals(formatter.format((TemporalAccessor) compareDate)));
+	private boolean isTodayOrBefore(LocalDate compareDate) { 
+		LocalDate now = LocalDate.now(Clock.systemDefaultZone());
+		return(now.isEqual(compareDate) || now.isAfter(compareDate));
 	}
 
 }

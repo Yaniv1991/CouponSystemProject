@@ -117,7 +117,7 @@ public class SingleUseMethods {
 	private static void createCouponTable() throws SQLException {
 		// TODO Auto-generated method stub
 		String sql = "create table coupons(id integer GENERATED ALWAYS AS IDENTITY(START WITH 1, INCREMENT BY 1)"
-				+ ",company_id INTEGER,category_id INTEGER,title VARCHAR(20),description VARCHAR(20),"
+				+ ",company_id INTEGER,category_id INTEGER,title VARCHAR(20),description VARCHAR(150),"
 				+ "start_date DATE,end_date DATE,amount INTEGER NOT NULL, price INTEGER NOT NULL,"
 				+ "image VARCHAR(20),PRIMARY KEY(id),"
 				+ "FOREIGN KEY(company_id) REFERENCES companies(id),FOREIGN KEY(category_id) REFERENCES categories(id))";

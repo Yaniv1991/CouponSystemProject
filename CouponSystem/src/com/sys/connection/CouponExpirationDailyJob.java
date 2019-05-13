@@ -45,13 +45,10 @@ public class CouponExpirationDailyJob implements Runnable {
 		while (!quit) {
 			try {
 				expiredCoupons = (List<Coupon>) couponDao.readAll();
-//				System.out.println(expiredCoupons);
 				removeUnexpiredCouponsFromList();
-				System.out.println(expiredCoupons);
+//				System.out.println("list of coupons to expire : " + expiredCoupons);
 				removeExpiredCouponsFromDB();
-//				if (allCouponsWereDeleted()) {
-//					expiredCoupons.clear();
-//				}
+				expiredCoupons.clear();
 				
 				Thread.sleep(sleepTime);
 			} catch (InterruptedException e) {
@@ -78,6 +75,7 @@ public class CouponExpirationDailyJob implements Runnable {
 	 */
 	private void removeExpiredCouponsFromDB() throws CouponSystemException {
 		for (Coupon expiredCoupon : expiredCoupons) {
+			couponDao.deleteAllFromHistory(expiredCoupon.getId());
 				couponDao.delete(expiredCoupon.getId());
 		}
 	}
@@ -105,7 +103,7 @@ public class CouponExpirationDailyJob implements Runnable {
 				i--;
 			}
 		}
-		System.out.print(expiredCoupons.size());
+//		System.out.println("This is a debug message. Number of expired coupons: " + expiredCoupons.size());
 	}
 
 	/**
