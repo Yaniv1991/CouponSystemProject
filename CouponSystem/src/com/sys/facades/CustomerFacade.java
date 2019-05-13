@@ -23,7 +23,6 @@ import com.sys.exception.CustomerException;
 public class CustomerFacade extends ClientFacade {
 
 	private Customer customer;
-
 	private CouponDBDAO couponDao;
 	private CustomerDBDAO customerDao;
 

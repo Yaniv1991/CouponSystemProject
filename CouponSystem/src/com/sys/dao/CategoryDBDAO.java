@@ -41,7 +41,6 @@ public void create(Category category) throws CouponSystemException {
 	}
 }
 
-
 @Override
 public Category read(int categoryId) throws CouponSystemException {
 	Category category = null;
@@ -98,7 +97,6 @@ public void delete(int categoryId) throws CouponSystemException {
 	} finally {disconnect();
 	}
 }
-
 
 @Override
 public Collection<Category> readAll() throws CouponSystemException {

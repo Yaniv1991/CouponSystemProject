@@ -75,7 +75,7 @@ public class CouponExpirationDailyJob implements Runnable {
 	 */
 	private void removeExpiredCouponsFromDB() throws CouponSystemException {
 		for (Coupon expiredCoupon : expiredCoupons) {
-			couponDao.deleteAllFromHistory(expiredCoupon.getId());
+			couponDao.deleteCouponFromHistory(expiredCoupon.getId());
 				couponDao.delete(expiredCoupon.getId());
 		}
 	}

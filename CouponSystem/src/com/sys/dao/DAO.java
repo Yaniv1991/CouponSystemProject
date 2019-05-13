@@ -55,6 +55,4 @@ public interface DAO <T>{
 	*/
 	Collection<T> readAll() throws CouponSystemException;
 
-
-
 }

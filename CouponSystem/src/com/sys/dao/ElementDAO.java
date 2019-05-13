@@ -48,5 +48,5 @@ public interface ElementDAO<T> extends DAO<T> {
 	* @param {@code couponId}
 	* @throws CouponException
 	*/
-	void deleteAllFromHistory(int couponId) throws CouponException;
+	void deleteCouponFromHistory(int couponId) throws CouponException;
 }

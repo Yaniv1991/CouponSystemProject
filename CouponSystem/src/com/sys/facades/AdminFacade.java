@@ -1,7 +1,6 @@
 package com.sys.facades;
 
 import java.util.Collection;
-import java.util.List;
 
 import com.sys.beans.Company;
 import com.sys.beans.Coupon;
@@ -47,7 +46,7 @@ private CouponDBDAO couponDao;
 		if (companyDao.read(companyDao.getIdByEmail(company.getEmail())) != null) {
 			throw new CompanyException("Company with same email already exists");
 		}
-		List<Company> allCompanies = (List<Company>) companyDao.readAll();
+		Collection<Company> allCompanies =  companyDao.readAll();
 
 		for (Company companyToCheck : allCompanies) {
 			if (company.getName().equalsIgnoreCase(companyToCheck.getName())) {
@@ -83,7 +82,7 @@ private CouponDBDAO couponDao;
 	public void removeCompany(Company company) throws CouponException, CompanyException {
 		company = companyDao.read(company.getId());
 		for (Coupon coupon : company.getCoupons()) {
-			couponDao.deleteAllFromHistory(coupon.getId());
+			couponDao.deleteCouponFromHistory(coupon.getId());
 			couponDao.delete(coupon.getId());
 			System.out.println("deleted " + coupon);
 		}

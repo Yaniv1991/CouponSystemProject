@@ -3,6 +3,7 @@ package com.sys.facades;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import com.sys.beans.Category;
 import com.sys.beans.Company;
 import com.sys.beans.Coupon;
@@ -41,8 +42,8 @@ public class CompanyFacade extends ClientFacade{
 	 */
 	public void addCoupon(Coupon coupon) throws CouponException {
 		
-		List<Coupon> allCoupons = (List<Coupon>) couponDao.readAll(company);
-		//TODO maybe change to a Map<String,Coupon>....
+		Collection<Coupon> allCoupons = couponDao.readAll(company);
+
 		for (Coupon couponFromList : allCoupons) {
 			if(couponFromList.getTitle().equalsIgnoreCase(coupon.getTitle())) {
 				throw new CouponException("Coupon already exists with the same title");

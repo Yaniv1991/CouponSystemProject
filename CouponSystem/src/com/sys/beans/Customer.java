@@ -42,7 +42,6 @@ public class Customer {
 		this.lastName = lastName;
 	}
 
-
 	public Customer(int id, String custName, String password, List<Coupon> coupons) {
 		super();
 		this.id = id;
@@ -77,6 +76,7 @@ public class Customer {
 	public void setId(int id) {
 		this.id = id;
 	}
+	
 	public String getPassword() {
 		return password;
 	}
@@ -92,7 +92,6 @@ public class Customer {
 	public void setCoupons(List<Coupon> coupons) {
 		this.coupons = coupons;
 	}
-
 	
 	@Override
 	public String toString() {
@@ -103,6 +102,7 @@ public class Customer {
 	public void addCoupon(Coupon coupon) {
 		coupons.add(coupon);
 	}
+
 	public void removeCoupon(Coupon coupon) {
 		coupons.remove(coupon);
 	}
@@ -128,5 +128,4 @@ public class Customer {
 			return false;
 		return true;
 	}
-
 }

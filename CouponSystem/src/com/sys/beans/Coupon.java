@@ -5,10 +5,10 @@ import java.time.LocalDate;
 
 /**
  * 
- * Coupon javabean class.<br>
+ * Coupon java bean class.<br>
  * Contains getters and setters for all attributes,<br>
  * and the methods {@code toString} and {@code equals} (as well as {@code hashCode} for the equals method).
- * 
+// * 
  * @authors Yaniv Chen & Gil Gouetta
  * 
  */
@@ -16,7 +16,7 @@ import java.time.LocalDate;
 public class Coupon {
 	private int id,companyId,categoryId;
 	public int getCategoryId() {
-		return categoryId;  //Ok, this should give me the id of the category enum. should i set it from the outside??
+		return categoryId;
 	}
 
 	public void setCategoryId(int categoryId) {
@@ -52,7 +52,6 @@ public class Coupon {
 			return false;
 		return true;
 	}
-
 
 	@Override
 	public String toString() {
@@ -109,7 +108,6 @@ public class Coupon {
 		this.title = title;
 	}
 
-
 	public double getPrice() {
 		return price;
 	}
@@ -123,6 +121,11 @@ public class Coupon {
 	}
 
 	public void setStartDate(LocalDate startDate) {
+		if(endDate != null) {
+			if(endDate.isAfter(startDate)) {
+				throw new IllegalArgumentException("Start date cannot be after end date");
+			}
+		}
 		this.startDate = startDate;
 	}
 
@@ -131,6 +134,11 @@ public class Coupon {
 	}
 
 	public void setEndDate(LocalDate endDate) {
+		if(startDate != null) {
+			if(startDate.isAfter(endDate)) {
+				throw new IllegalArgumentException("End date cannot be before start date");
+			}
+		}
 		this.endDate = endDate;
 	}
 
@@ -145,7 +153,6 @@ public class Coupon {
 	public Coupon() {
 		super();
 	}
-
 
 	public Coupon(int id) {
 		super();
@@ -163,50 +170,8 @@ public class Coupon {
 		this.description = description;
 		this.category = category;
 		this.price = price;
-		this.startDate = startDate;
-		this.endDate = endDate;
+		setStartDate(startDate);
+		setEndDate(endDate);
 		this.image = image;
 	}
-	
-
-//	@Override
-//	public String create() {
-//		// ("insert into coupon "
-//				// + "(id,title,start_date,end_date,amount,type,message,price,image) "
-//				// + "values (?,?,?,?,?,?,?,?,?)");
-//		
-//		return "INSERT INTO coupon "
-//				+ "(id,title,start_date,end_date,amount,type,message,price,image)"
-//				+ "VALUES(" +id+ ",'"+ title + "'," + startDate + "," + endDate + ","
-//				+amount + ",'" + couponType + "','" + message + "'," + price + ",'" 
-//				+ image + "')" ;
-//	}
-//
-//	@Override
-//	public String read() {
-//		return "SELECT * FROM coupon WHERE id = " + id;
-//	}
-//
-//	@Override
-//	public String update() {
-////		("update coupon set "
-////		+ "title = ?, Start_date = ?, end_date = ?,"
-////		+ "amount = ? , type = ? , message = ?,"
-////		+ "price = ? ,image = ? where id = ?")
-//		
-//		return "update coupon set "
-//				+ "title = ''" + title + ", Start_date =" + getSqlStartDate() 
-//				+", end_date = " + getSqlEndDate() 
-//				+ ",amount = "+ amount + " , type = '" 
-//				+getCouponType() + "', message = '" + message +"',"
-//				+ "price = " + price
-//				+ " ,image = '" +image+"'"
-//				+ " where id = " + id;
-//	}
-//
-//	@Override
-//	public String delete() {
-//		return "DELETE FROM coupon WHERE id = " + id;
-//	}
-
 }
