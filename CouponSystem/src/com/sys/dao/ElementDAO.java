@@ -35,13 +35,7 @@ public interface ElementDAO<T> extends DAO<T> {
 	* @throws CouponSystemException
 	*/
 	void deletePurchase(int couponId,Customer customer) throws CouponSystemException;
-	/**
-	* {@code deleteCouponsOfCustomer}</br></br>
-	* Removes all coupon purchase history by the customer from the DB.
-	* @param {@code customerId}
-	* @throws CouponException
-	*/
-	void deleteCouponsOfCustomer(int customerId) throws CouponException;
+
 	/**
 	* {@code deleteAllFromHistory}</br></br>
 	* Removes the purchase history for a single coupon by all customers.

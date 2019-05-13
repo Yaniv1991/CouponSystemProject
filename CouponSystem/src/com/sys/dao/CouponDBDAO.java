@@ -378,12 +378,5 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		finally {disconnect();}
 	}
 
-	public void deleteCouponsOfCustomer(int customerId) throws CouponException {
-		Customer customer = new Customer(customerId);
-		Collection<Coupon> couponsToDelete = readAll(customer);		
-		for (Coupon coupon : couponsToDelete) {
-			deletePurchase(coupon.getId(), customer);
-		}
-	}
 	
 }

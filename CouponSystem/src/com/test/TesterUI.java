@@ -120,7 +120,7 @@ public class TesterUI {
 					facade.removeCustomer(new Customer(readInteger("customer")));
 					break;
 				}
-				case "read all customers": {
+				case "show all customers": {
 					readList(facade.getAllCustomers());
 					break;
 				}

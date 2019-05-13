@@ -144,7 +144,10 @@ private CouponDBDAO couponDao;
 	 */
 	public void removeCustomer(Customer customer) throws CustomerException {
 		try {
-			couponDao.deleteCouponsOfCustomer(customer.getId());
+			Collection<Coupon> couponsToDelete = couponDao.readAll(customer);		
+			for (Coupon coupon : couponsToDelete) {
+				couponDao.deletePurchase(coupon.getId(), customer);
+			}
 		} catch (CouponException e) {
 			throw new CustomerException("error in deleting all coupons of customer",e);
 		}

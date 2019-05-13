@@ -122,7 +122,7 @@ public class Coupon {
 
 	public void setStartDate(LocalDate startDate) {
 		if(endDate != null) {
-			if(endDate.isAfter(startDate)) {
+			if(endDate.isBefore(startDate)) {
 				throw new IllegalArgumentException("Start date cannot be after end date");
 			}
 		}
