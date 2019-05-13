@@ -13,7 +13,6 @@ import java.util.List;
  * @authors Yaniv Chen & Gil Gouetta
  *
  */
-
 public class Company {
 private int id;
 private String name,password,email;
