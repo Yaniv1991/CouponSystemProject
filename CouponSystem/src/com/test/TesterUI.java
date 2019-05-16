@@ -16,6 +16,7 @@ import com.sys.connection.CouponExpirationDailyJob;
 import com.sys.exception.CouponSystemException;
 import com.sys.facades.AdminFacade;
 import com.sys.facades.ClientFacade;
+import com.sys.facades.ClientType;
 import com.sys.facades.CompanyFacade;
 import com.sys.facades.CustomerFacade;
 import com.sys.facades.LoginManager;
@@ -32,28 +33,28 @@ public class TesterUI {
 	public void startUI() {
 
 		while (!quit) {
-				showMenu();
+			showMenu();
 		}
 	}
 
-	private void showMenu()  {
+	private void showMenu() {
 
 		showOptions();
 		boolean inputIsValid = false;
-		while(!inputIsValid) {
-		try {
-			performAction(in.nextLine());
-			inputIsValid = true;
-		} catch (CouponSystemException e) {
-			System.out.println("please enter a valid input");
-			e.printStackTrace();
-			continue;
-		}
+		while (!inputIsValid) {
+			try {
+				performAction(in.nextLine());
+				inputIsValid = true;
+			} catch (CouponSystemException e) {
+				System.out.println("please enter a valid input");
+				e.printStackTrace();
+				continue;
+			}
 		}
 	}
 
-	private void performAction(String command) throws CouponSystemException  {
-		
+	private void performAction(String command) throws CouponSystemException {
+
 		if (!hasStarted) {
 			switch (command) {
 			case "start": {
@@ -106,7 +107,7 @@ public class TesterUI {
 					readList(facade.getAllCompanies());
 					break;
 				}
-				case "get company by id":{
+				case "get company by id": {
 					System.out.println(facade.getCompanyById(readInteger("company id")));
 					break;
 				}
@@ -115,7 +116,7 @@ public class TesterUI {
 					facade.addCustomer(createCustomer());
 					break;
 				}
-				
+
 				case "delete customer": {
 					facade.removeCustomer(new Customer(readInteger("customer")));
 					break;
@@ -125,13 +126,13 @@ public class TesterUI {
 					break;
 				}
 				case "update customer": {
-					
+
 					Customer customerToUpdate = facade.getCustomerById(readInteger("customer id"));
 					updateCustomer(customerToUpdate);
 					facade.updateCustomer(customerToUpdate);
 					break;
 				}
-				case "get customer by id":{
+				case "get customer by id": {
 					System.out.println(facade.getCustomerById(readInteger("customer id")));
 				}
 //				default: {
@@ -147,7 +148,7 @@ public class TesterUI {
 					facade.purchaseCoupon(readInteger("coupon id"));
 					break;
 				}
-				
+
 				case "get all coupons": {
 					readList(facade.getAllCoupons());
 					break;
@@ -255,8 +256,8 @@ public class TesterUI {
 	}
 
 	private int getCompanyIdFromFacade() {
-		if(facade instanceof CompanyFacade) {
-			facade = (CompanyFacade)this.facade;
+		if (facade instanceof CompanyFacade) {
+			facade = (CompanyFacade) this.facade;
 			try {
 				return ((CompanyFacade) facade).getCompanyDetails().getId();
 			} catch (CouponSystemException e) {
@@ -270,32 +271,30 @@ public class TesterUI {
 	private LocalDate readDate(String message) {
 		while (true) {
 			try {
-			System.out.println("enter " + message);
-			String input = in.nextLine();
-			LocalDate result = LocalDate.parse(input, DateTimeFormatter.ofPattern("uuuu-MM-dd"));
-			return result;
-		}
-			catch(DateTimeParseException e) {
+				System.out.println("enter " + message);
+				String input = in.nextLine();
+				LocalDate result = LocalDate.parse(input, DateTimeFormatter.ofPattern("uuuu-MM-dd"));
+				return result;
+			} catch (DateTimeParseException e) {
 				System.out.println("invalid input");
 			}
-			}
+		}
 	}
-
 
 	private Category selectCategory() {
-		while(true) {
-		try {
-			System.out.println("please enter a category\n");
-			
-		for (Category category : Category.values()) {
-			System.out.println(category);
-		}
-		return Category.valueOf(in.nextLine().toUpperCase());}
-		catch(IllegalArgumentException e) {
-			System.out.println("invalid input");
-		}}
-	}
+		while (true) {
+			try {
+				System.out.println("please enter a category\n");
 
+				for (Category category : Category.values()) {
+					System.out.println(category);
+				}
+				return Category.valueOf(in.nextLine().toUpperCase());
+			} catch (IllegalArgumentException e) {
+				System.out.println("invalid input");
+			}
+		}
+	}
 
 	private void updateCustomer(Customer customerToUpdate) {
 		Customer updatedDetails = createCustomer();
@@ -413,7 +412,7 @@ public class TesterUI {
 		System.out.println();
 		System.out.println();
 		System.out.println();
-		
+
 		for (String string : options) {
 			System.out.println(string);
 		}
@@ -422,7 +421,21 @@ public class TesterUI {
 	private void login() throws CouponSystemException {
 		String email = inputData("email");
 		String password = inputData("password");
-		facade = LoginManager.getInstance().login(email,password);
+		ClientType type = selectClientType();
+		facade = LoginManager.getInstance().login(email, password, type);
+	}
+
+	private ClientType selectClientType() {
+		while (true) {
+			try {
+				for (ClientType type : ClientType.values()) {
+					System.out.println(type);
+				}
+				return ClientType.valueOf(inputData("Client type").toUpperCase());
+			} catch (IllegalArgumentException e) {
+				System.out.println("invalid input");
+			}
+		}
 	}
 
 	private String inputData(String propertyToInput) {
