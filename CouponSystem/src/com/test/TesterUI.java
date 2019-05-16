@@ -419,9 +419,9 @@ public class TesterUI {
 	}
 
 	private void login() throws CouponSystemException {
+		ClientType type = selectClientType();
 		String email = inputData("email");
 		String password = inputData("password");
-		ClientType type = selectClientType();
 		facade = LoginManager.getInstance().login(email, password, type);
 	}
 
