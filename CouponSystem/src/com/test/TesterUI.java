@@ -95,6 +95,9 @@ public class TesterUI {
 					List<Company> companies = (List<Company>) facade.getAllCompanies();
 					readList(companies);
 					Company companyToUpdate = facade.getCompanyById(readInteger("company"));
+					if(companyToUpdate == null) {
+						throw new CouponSystemException("company id does not exist");
+					}
 					updateCompany(companyToUpdate);
 					facade.updateCompany(companyToUpdate);
 					break;
@@ -128,6 +131,9 @@ public class TesterUI {
 				case "update customer": {
 
 					Customer customerToUpdate = facade.getCustomerById(readInteger("customer id"));
+				if(customerToUpdate==null) {
+					throw new CouponSystemException("customer does not exist");
+				}
 					updateCustomer(customerToUpdate);
 					facade.updateCustomer(customerToUpdate);
 					break;
@@ -189,6 +195,9 @@ public class TesterUI {
 				case "update coupon": {
 
 					Coupon couponToUpdate = facade.read(readInteger("coupon id"));
+					if(couponToUpdate == null) {
+						throw new CouponSystemException("coupon does not exist");
+					}
 					updateCoupon(couponToUpdate);
 					facade.updateCoupon(couponToUpdate);
 					break;
@@ -261,10 +270,9 @@ public class TesterUI {
 			try {
 				return ((CompanyFacade) facade).getCompanyDetails().getId();
 			} catch (CouponSystemException e) {
-				return 0;
+//				return 0;
 			}
 		}
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
