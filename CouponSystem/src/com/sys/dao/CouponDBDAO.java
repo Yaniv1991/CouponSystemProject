@@ -21,6 +21,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Clock;
 import java.time.LocalDate;
 
 /**
@@ -46,6 +47,8 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 
 	private static String sqlDeleteHistory = "delete from customers_vs_coupons where coupon_id = ?";
 
+	private static String sqlReadExpiredCoupons = "select * from coupons where end_date < ?";
+	
 	private Connection connection;
 	private Map<Integer, Category> categoryDictionary;
 	private Map<Category, Integer> reverseCategoryDictionary;
@@ -378,5 +381,22 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		finally {disconnect();}
 	}
 
-	
+	public Collection<Coupon> readAllExpiredCoupons() throws CouponSystemException {
+		List<Coupon> result = new ArrayList<Coupon>();
+		connect();
+		try {
+			PreparedStatement read = connection.prepareStatement(sqlReadExpiredCoupons);
+			LocalDate today = LocalDate.now(Clock.systemDefaultZone());
+			read.setDate(1, Date.valueOf(today));
+			ResultSet rs = read.executeQuery();
+			while(rs.next()) {
+				result.add(readFromActiveConnection(rs.getInt("id"), rs));
+			}
+		} catch (SQLException e) {
+			throw new CouponException("error in getting all expired coupons",e);
+		}
+		finally {disconnect();}
+		
+		return result;
+	}
 }

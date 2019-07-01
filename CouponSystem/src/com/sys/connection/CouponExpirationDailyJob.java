@@ -26,12 +26,11 @@ import com.sys.facades.LoginManager;
  *
  */
 
-
 public class CouponExpirationDailyJob implements Runnable {
 
 	private boolean quit = false;
-	private CouponDBDAO couponDao ;
-	
+	private CouponDBDAO couponDao;
+
 	/**
 	 * Generator for the daily job.
 	 */
@@ -43,79 +42,80 @@ public class CouponExpirationDailyJob implements Runnable {
 	private final long sleepTime = 86400000;
 	private List<Coupon> expiredCoupons;
 
-	
-/**
- * 
- * Implements {@code runnable} method {@code run()}.</br>
- * This Daily job is affectively running everyday while the system is up.
- * 
- */
+	/**
+	 * 
+	 * Implements {@code runnable} method {@code run()}.</br>
+	 * This Daily job is affectively running everyday while the system is up.
+	 * 
+	 */
 	@Override
 	public void run() {
 		while (!quit) {
 			try {
-				expiredCoupons = (List<Coupon>) couponDao.readAll();
-				removeUnexpiredCouponsFromList();
-//				System.out.println("list of coupons to expire : " + expiredCoupons);
+				expiredCoupons = (List<Coupon>) couponDao.readAllExpiredCoupons();
 				removeExpiredCouponsFromDB();
 				expiredCoupons.clear();
-				
+
 				Thread.sleep(sleepTime);
 			} catch (InterruptedException e) {
-				if(quit) {
+				if (quit) {
 					System.out.println("Thread ended safely");
+				} else {
+					DbExceptionHandler.HandleException(e);
+					continue;
 				}
-				else {
-				DbExceptionHandler.HandleException(e);
-				continue;}
 			} catch (CouponSystemException e) {
 				DbExceptionHandler.HandleException(e);
 			}
 		}
 	}
 
-/**
- * 
- * {@code removeExpiredCouponsFromDB}</br></br>
- * Removes expired coupons from the DB.</br>
- * Iterates through all coupons in the list, pulled from the DB, </br>
- * and "cleaned" using {@link #removeUnexpiredCouponsFromList() removeUnexpiredCouponsFromList} and deletes all of them.
- * 
- * @throws CouponSystemException
- */
-	
+	/**
+	 * 
+	 * {@code removeExpiredCouponsFromDB}</br>
+	 * </br>
+	 * Removes expired coupons from the DB.</br>
+	 * Iterates through all coupons in the list, pulled from the DB, </br>
+	 * and "cleaned" using {@link #removeUnexpiredCouponsFromList()
+	 * removeUnexpiredCouponsFromList} and deletes all of them.
+	 * 
+	 * @throws CouponSystemException
+	 */
+
 	private void removeExpiredCouponsFromDB() throws CouponSystemException {
 		for (Coupon expiredCoupon : expiredCoupons) {
 			couponDao.deleteCouponFromHistory(expiredCoupon.getId());
-				couponDao.delete(expiredCoupon.getId());
+			couponDao.delete(expiredCoupon.getId());
 		}
 	}
 
-/**
- * {@code allCouponsWereDeleted}</br></br>
- * Checks if all expired coupons were deleted.	
- * 
- * @return True if the list of coupons to delete is empty, False otherwise.
- * @throws CouponSystemException
- */
+	/**
+	 * {@code allCouponsWereDeleted}</br>
+	 * </br>
+	 * Checks if all expired coupons were deleted.
+	 * 
+	 * @return True if the list of coupons to delete is empty, False otherwise.
+	 * @throws CouponSystemException
+	 */
 
 	private boolean allCouponsWereDeleted() throws CouponSystemException {
 		for (Coupon expiredCoupon : expiredCoupons) {
-				if (couponDao.read(expiredCoupon.getId()) != null) {
-					return false;
+			if (couponDao.read(expiredCoupon.getId()) != null) {
+				return false;
 			}
 		}
 
 		return true;
 	}
 
-/**
- * {@code removeUnexpiredCouponsFromList}</br></br>
- * Iterates through the list of coupons, pulled from the DB,</br>
- * and removes the ones that haven't expired.
- * 
- */
-	
+	/**
+	 * {@code removeUnexpiredCouponsFromList}</br>
+	 * </br>
+	 * Iterates through the list of coupons, pulled from the DB,</br>
+	 * and removes the ones that haven't expired.
+	 * 
+	 */
+
 	private void removeUnexpiredCouponsFromList() {
 		for (int i = 0; i < expiredCoupons.size(); i++) {
 			if (expiredCoupons.get(i).getEndDate().isAfter(LocalDate.now(Clock.systemDefaultZone()))) {
@@ -127,11 +127,12 @@ public class CouponExpirationDailyJob implements Runnable {
 //		System.out.println("This is a debug message. Number of expired coupons: " + expiredCoupons.size());
 	}
 
-/**
- * {@code stop}</br></br>
- * Stops the thread. Sets {@code quit} to true. 
- * 
- */
+	/**
+	 * {@code stop}</br>
+	 * </br>
+	 * Stops the thread. Sets {@code quit} to true.
+	 * 
+	 */
 	public void stop() {
 		quit = true;
 	}

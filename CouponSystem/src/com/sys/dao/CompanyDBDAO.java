@@ -117,7 +117,7 @@ public class CompanyDBDAO implements UserDAO<Company> {
 		connect();
 		try (PreparedStatement update = connection.prepareStatement(sqlUpdate)) {
 
-			update.setString(1, company.getName());
+		 	update.setString(1, company.getName());
 			update.setString(2, company.getPassword());
 			update.setString(3, company.getEmail());
 			update.setInt(4, company.getId());
