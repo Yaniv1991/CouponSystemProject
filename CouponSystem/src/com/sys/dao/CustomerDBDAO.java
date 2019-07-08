@@ -151,6 +151,25 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 		return result;
 	}
 
+	@Override
+	public int getIdByEmail(String email) throws CustomerException {
+		connect();
+		int id = -1;
+		try (Statement stmt = connection.createStatement()) {
+			String sql = "select * from customers where email = '" + email + "'";
+			ResultSet rs = stmt.executeQuery(sql);
+			if (rs.next()) {
+				id = rs.getInt("id");
+			}
+		} catch (SQLException e) {
+			throw new CustomerException("error in getting customer id by email", e);
+		} finally {
+			disconnect();
+		}
+	
+		return id;
+	}
+
 	/**
 	 * Receives a connection from the {@link com.sys.connection.ConnectionPool ConnectionPool}
 	 * @throws CouponException
@@ -220,24 +239,5 @@ public class CustomerDBDAO implements UserDAO<Customer> {
 			throw new CustomerException("error in reading customer",e);
 		}
 		return result;
-	}
-
-	@Override
-	public int getIdByEmail(String email) throws CustomerException {
-		connect();
-		int id = -1;
-		try (Statement stmt = connection.createStatement()) {
-			String sql = "select * from customers where email = '" + email + "'";
-			ResultSet rs = stmt.executeQuery(sql);
-			if (rs.next()) {
-				id = rs.getInt("id");
-			}
-		} catch (SQLException e) {
-			throw new CustomerException("error in getting customer id by email", e);
-		} finally {
-			disconnect();
-		}
-
-		return id;
 	}
 }

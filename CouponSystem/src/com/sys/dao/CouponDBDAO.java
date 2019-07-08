@@ -115,43 +115,6 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		return result;
 	}
 
-	/**
-	 * Returns a {@link com.sys.beans.Coupon Coupon} object using a result set from
-	 * a DB query, and a coupon id.
-	 * 
-	 * @param id - Integer
-	 * @param rs - Result set
-	 * @return a {@link com.sys.beans.Coupon Coupon} object.
-	 * @throws SQLException
-	 * @throws CouponSystemException
-	 */
-	private Coupon readFromActiveConnection(int id, ResultSet rs) throws SQLException, CouponSystemException {
-		Coupon result;
-		result = new Coupon();
-
-		int amount = rs.getInt("amount");
-		int companyId = rs.getInt("company_id");
-		String title = rs.getString("title");
-		String description = rs.getString("description");
-		Category category = categoryDictionary.get(rs.getInt("category_id"));
-		double price = rs.getDouble("price");
-		LocalDate startDate = rs.getDate("start_date").toLocalDate();
-		LocalDate endDate = rs.getDate("end_date").toLocalDate();
-		String image = rs.getString("image");
-		result.setCompanyId(companyId);
-		result.setAmount(amount);
-		result.setCategory(category);
-		result.setCategoryId(reverseCategoryDictionary.get(category));
-		result.setEndDate(endDate);
-		result.setStartDate(startDate);
-		result.setId(id);
-		result.setImage(image);
-		result.setDescription(description);
-		result.setPrice(price);
-		result.setTitle(title);
-		return result;
-	}
-
 	@Override
 	public void update(Coupon coupon) throws CouponException {
 
@@ -210,13 +173,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		return result;
 	}
 
-	/**
-	 * Returns all coupons posted by a specific company.
-	 * 
-	 * @param company - a {@link com.sys.beans.Company Company} object.
-	 * @return a collection of {@link com.sys.beans.Coupon Coupon} objects.
-	 * @throws CouponException
-	 */
+	@Override
 	public Collection<Coupon> readAll(Company company) throws CouponException {
 		List<Coupon> result = new ArrayList<>();
 		connect();
@@ -236,13 +193,7 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		return result;
 	}
 
-	/**
-	 * Returns all coupons purchased by a specific customer.
-	 * 
-	 * @param customer - a {@link com.sys.beans.Customer Customer} object.
-	 * @return a collection of {@link com.sys.beans.Coupon Coupon} objects.
-	 * @throws CouponException
-	 */
+	@Override
 	public Collection<Coupon> readAll(Customer customer) throws CouponException {
 		List<Coupon> result = new ArrayList<Coupon>();
 
@@ -260,6 +211,69 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		} finally {
 			disconnect();
 		}
+		return result;
+	}
+
+	@Override
+	public boolean exists(int customerId, int couponId) throws CouponException {
+		boolean result = false;
+		connect();
+		String preparedSql = "select * from customers_vs_coupons where customer_id = ? AND coupon_id = ?";
+		try (PreparedStatement read = connection.prepareStatement(preparedSql)) {
+			read.setInt(1, customerId);
+			read.setInt(2, couponId);
+			ResultSet rs = read.executeQuery();
+			result = rs.next();
+	
+		} catch (SQLException e) {
+			throw new CouponException("error in fetching coupon from customers_vs_coupons", e);
+		} finally {
+			disconnect();
+		}
+		return result;
+	}
+
+	@Override
+	public void addPurchase(int couponId, Customer customer) throws CouponException {
+		readAndIncrement(couponId, -1);
+		changeCustomersVsCoupons(couponId, customer, true);
+	}
+
+	@Override
+	public void deletePurchase(int couponId, Customer customer) throws CouponException {
+		readAndIncrement(couponId, 1);
+		changeCustomersVsCoupons(couponId, customer, false);
+	}
+
+	@Override
+	public void deleteCouponFromHistory(int couponId) throws CouponException {
+		connect();
+		try (PreparedStatement delete = connection.prepareStatement(sqlDeleteHistory)) {
+			delete.setInt(1, couponId);
+			delete.execute();
+		} catch (SQLException e) {
+			throw new CouponException("error in deleting purchase history of coupons", e);
+		}
+		finally {disconnect();}
+	}
+
+	@Override
+	public Collection<Coupon> readAllExpiredCoupons() throws CouponSystemException {
+		List<Coupon> result = new ArrayList<Coupon>();
+		connect();
+		try {
+			PreparedStatement read = connection.prepareStatement(sqlReadExpiredCoupons);
+			LocalDate today = LocalDate.now(Clock.systemDefaultZone());
+			read.setDate(1, Date.valueOf(today));
+			ResultSet rs = read.executeQuery();
+			while(rs.next()) {
+				result.add(readFromActiveConnection(rs.getInt("id"), rs));
+			}
+		} catch (SQLException e) {
+			throw new CouponException("error in getting all expired coupons",e);
+		}
+		finally {disconnect();}
+		
 		return result;
 	}
 
@@ -292,29 +306,41 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		connection = null;
 	}
 
-	@Override
-	public boolean exists(int customerId, int couponId) throws CouponException {
-		boolean result = false;
-		connect();
-		String preparedSql = "select * from customers_vs_coupons where customer_id = ? AND coupon_id = ?";
-		try (PreparedStatement read = connection.prepareStatement(preparedSql)) {
-			read.setInt(1, customerId);
-			read.setInt(2, couponId);
-			ResultSet rs = read.executeQuery();
-			result = rs.next();
-
-		} catch (SQLException e) {
-			throw new CouponException("error in fetching coupon from customers_vs_coupons", e);
-		} finally {
-			disconnect();
-		}
+	/**
+	 * Returns a {@link com.sys.beans.Coupon Coupon} object using a result set from
+	 * a DB query, and a coupon id.
+	 * 
+	 * @param id - Integer
+	 * @param rs - Result set
+	 * @return a {@link com.sys.beans.Coupon Coupon} object.
+	 * @throws SQLException
+	 * @throws CouponSystemException
+	 */
+	private Coupon readFromActiveConnection(int id, ResultSet rs) throws SQLException, CouponSystemException {
+		Coupon result;
+		result = new Coupon();
+	
+		int amount = rs.getInt("amount");
+		int companyId = rs.getInt("company_id");
+		String title = rs.getString("title");
+		String description = rs.getString("description");
+		Category category = categoryDictionary.get(rs.getInt("category_id"));
+		double price = rs.getDouble("price");
+		LocalDate startDate = rs.getDate("start_date").toLocalDate();
+		LocalDate endDate = rs.getDate("end_date").toLocalDate();
+		String image = rs.getString("image");
+		result.setCompanyId(companyId);
+		result.setAmount(amount);
+		result.setCategory(category);
+		result.setCategoryId(reverseCategoryDictionary.get(category));
+		result.setEndDate(endDate);
+		result.setStartDate(startDate);
+		result.setId(id);
+		result.setImage(image);
+		result.setDescription(description);
+		result.setPrice(price);
+		result.setTitle(title);
 		return result;
-	}
-
-	@Override
-	public void addPurchase(int couponId, Customer customer) throws CouponException {
-		readAndIncrement(couponId, -1);
-		changeCustomersVsCoupons(couponId, customer, true);
 	}
 
 	/**
@@ -347,12 +373,6 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		}
 	}
 
-	@Override
-	public void deletePurchase(int couponId, Customer customer) throws CouponException {
-		readAndIncrement(couponId, 1);
-		changeCustomersVsCoupons(couponId, customer, false);
-	}
-
 	/**
 	 * Makes the appropriate increment in the {@code amount} field in the
 	 * {@code Coupon} entry in the DB.<br>
@@ -367,36 +387,5 @@ public class CouponDBDAO implements ElementDAO<Coupon> {
 		Coupon coupon = read(couponId);
 		coupon.setAmount(coupon.getAmount() + increment);
 		update(coupon);
-	}
-
-	@Override
-	public void deleteCouponFromHistory(int couponId) throws CouponException {
-		connect();
-		try (PreparedStatement delete = connection.prepareStatement(sqlDeleteHistory)) {
-			delete.setInt(1, couponId);
-			delete.execute();
-		} catch (SQLException e) {
-			throw new CouponException("error in deleting purchase history of coupons", e);
-		}
-		finally {disconnect();}
-	}
-
-	public Collection<Coupon> readAllExpiredCoupons() throws CouponSystemException {
-		List<Coupon> result = new ArrayList<Coupon>();
-		connect();
-		try {
-			PreparedStatement read = connection.prepareStatement(sqlReadExpiredCoupons);
-			LocalDate today = LocalDate.now(Clock.systemDefaultZone());
-			read.setDate(1, Date.valueOf(today));
-			ResultSet rs = read.executeQuery();
-			while(rs.next()) {
-				result.add(readFromActiveConnection(rs.getInt("id"), rs));
-			}
-		} catch (SQLException e) {
-			throw new CouponException("error in getting all expired coupons",e);
-		}
-		finally {disconnect();}
-		
-		return result;
 	}
 }

@@ -88,29 +88,6 @@ public class CompanyDBDAO implements UserDAO<Company> {
 		return result;
 	}
 
-	/**
-	 * Receives a company id and a result set and returns a complete {@link com.sys.beans.Company Company} object.
-	 * @param id Company id.
-	 * @param rs Result Set.
-	 * @return a {@link com.sys.beans.Company Company} object.
-	 * @throws CompanyException
-	 */
-	private Company readFromActiveConnection(int id, ResultSet rs) throws CompanyException {
-		Company result;
-		result = new Company(id);
-		try {
-			result.setName(rs.getString("name"));
-			result.setPassword(rs.getString("password"));
-			result.setEmail(rs.getString("email"));
-			result.setCoupons((List<Coupon>) couponDao.readAll(result));
-		} catch (SQLException e) {
-			throw new CompanyException("error in reading company", e, result);
-		} catch (CouponException e) {
-			throw new CompanyException("error in reading coupons of company", e, result);
-		}
-		return result;
-	}
-
 	@Override
 	public void update(Company company) throws CompanyException {
 //		"update companies set name = ?,password = ?,email = ? where id = ?"
@@ -161,6 +138,48 @@ public class CompanyDBDAO implements UserDAO<Company> {
 
 	}
 
+	@Override
+	public int getIdByEmail(String email) throws CompanyException {
+		connect();
+		int id = -1;
+		try (Statement stmt = connection.createStatement()) {
+			String sql = "select id from companies where email = '" + email + "'";
+			ResultSet rs = stmt.executeQuery(sql);
+			if (rs.next()) {
+				id = rs.getInt("id");
+			}
+			
+		} catch (SQLException e) {
+			throw new CompanyException("error in getting company id", e);
+		}
+		finally {disconnect();}
+	
+		return id;
+	}
+
+	/**
+	 * Receives a company id and a result set and returns a complete {@link com.sys.beans.Company Company} object.
+	 * @param id Company id.
+	 * @param rs Result Set.
+	 * @return a {@link com.sys.beans.Company Company} object.
+	 * @throws CompanyException
+	 */
+	private Company readFromActiveConnection(int id, ResultSet rs) throws CompanyException {
+		Company result;
+		result = new Company(id);
+		try {
+			result.setName(rs.getString("name"));
+			result.setPassword(rs.getString("password"));
+			result.setEmail(rs.getString("email"));
+			result.setCoupons((List<Coupon>) couponDao.readAll(result));
+		} catch (SQLException e) {
+			throw new CompanyException("error in reading company", e, result);
+		} catch (CouponException e) {
+			throw new CompanyException("error in reading coupons of company", e, result);
+		}
+		return result;
+	}
+
 	/**
 	 * Receives a connection from the {@link com.sys.connection.ConnectionPool ConnectionPool}
 	 * @throws CouponException
@@ -208,25 +227,6 @@ public class CompanyDBDAO implements UserDAO<Company> {
 			throw new CompanyException("error in reading company", e, result);
 		}
 		return result;
-	}
-
-	@Override
-	public int getIdByEmail(String email) throws CompanyException {
-		connect();
-		int id = -1;
-		try (Statement stmt = connection.createStatement()) {
-			String sql = "select id from companies where email = '" + email + "'";
-			ResultSet rs = stmt.executeQuery(sql);
-			if (rs.next()) {
-				id = rs.getInt("id");
-			}
-			
-		} catch (SQLException e) {
-			throw new CompanyException("error in getting company id", e);
-		}
-		finally {disconnect();}
-
-		return id;
 	}
 
 }

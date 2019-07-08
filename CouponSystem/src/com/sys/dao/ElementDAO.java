@@ -1,5 +1,9 @@
 package com.sys.dao;
 
+import java.util.Collection;
+
+import com.sys.beans.Company;
+import com.sys.beans.Coupon;
 import com.sys.beans.Customer;
 import com.sys.exception.CouponException;
 import com.sys.exception.CouponSystemException;
@@ -43,4 +47,25 @@ public interface ElementDAO<T> extends DAO<T> {
 	* @throws CouponException
 	*/
 	void deleteCouponFromHistory(int couponId) throws CouponException;
+	
+	/**
+	 * Returns all coupons posted by a specific company.
+	 * 
+	 * @param company - a {@link com.sys.beans.Company Company} object.
+	 * @return a collection of {@link com.sys.beans.Coupon Coupon} objects.
+	 * @throws CouponException
+	 */
+	Collection<Coupon> readAll(Company company) throws CouponException;
+	
+	/**
+	 * Returns all coupons purchased by a specific customer.
+	 * 
+	 * @param customer - a {@link com.sys.beans.Customer Customer} object.
+	 * @return a collection of {@link com.sys.beans.Coupon Coupon} objects.
+	 * @throws CouponException
+	 */
+	 Collection<Coupon> readAll(Customer customer) throws CouponException;
+	 
+	 //TODO Javadoc
+	 Collection<Coupon> readAllExpiredCoupons() throws CouponSystemException; 
 }
