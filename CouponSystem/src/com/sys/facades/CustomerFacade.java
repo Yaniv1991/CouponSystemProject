@@ -10,6 +10,8 @@ import com.sys.beans.Coupon;
 import com.sys.beans.Customer;
 import com.sys.dao.CouponDBDAO;
 import com.sys.dao.CustomerDBDAO;
+import com.sys.dao.ElementDAO;
+import com.sys.dao.UserDAO;
 import com.sys.exception.CouponException;
 import com.sys.exception.CouponSystemException;
 import com.sys.exception.CustomerException;
@@ -23,8 +25,8 @@ import com.sys.exception.CustomerException;
 public class CustomerFacade extends ClientFacade {
 
 	private Customer customer;
-	private CouponDBDAO couponDao;
-	private CustomerDBDAO customerDao;
+	private ElementDAO<Coupon> couponDao;
+	private UserDAO<Customer> customerDao;
 
 	public CustomerFacade(int id,CouponDBDAO couponDao,CustomerDBDAO customerDao) {
 		customer = new Customer(id);
@@ -33,7 +35,7 @@ public class CustomerFacade extends ClientFacade {
 	}
 
 	@Override
-	boolean login(String email, String password) throws CustomerException {
+	boolean login(String email, String password) throws CouponSystemException {
 		return (customerDao.exists(email, password));
 	}
 
@@ -41,9 +43,9 @@ public class CustomerFacade extends ClientFacade {
 	 * Allows the customer to purchase a single coupon.<br>
 	 * Updates all relevant tables in the DB.
 	 * @param couponId - Integer representing the id for the purchased coupon.
-	 * @throws CouponException
+	 * @throws CouponSystemException 
 	 */
-	public void purchaseCoupon(int couponId) throws CouponException {
+	public void purchaseCoupon(int couponId) throws CouponSystemException {
 		Coupon coupon = couponDao.read(couponId);
 		if(coupon == null) {
 			throw new CouponException("Coupon does not exist");
@@ -124,9 +126,9 @@ public class CustomerFacade extends ClientFacade {
 	/**
 	 * Return all the details for the customer from the DB.
 	 * @return {@link com.sys.beans.Customer Customer} object
-	 * @throws CustomerException
+	 * @throws CouponSystemException 
 	 */
-	public Customer getCustomerDetails() throws CustomerException {
+	public Customer getCustomerDetails() throws CouponSystemException {
 			return customerDao.read(customer.getId());
 	}
 

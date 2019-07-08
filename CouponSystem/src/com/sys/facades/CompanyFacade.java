@@ -9,6 +9,8 @@ import com.sys.beans.Company;
 import com.sys.beans.Coupon;
 import com.sys.dao.CompanyDBDAO;
 import com.sys.dao.CouponDBDAO;
+import com.sys.dao.ElementDAO;
+import com.sys.dao.UserDAO;
 import com.sys.exception.CouponException;
 import com.sys.exception.CouponSystemException;
 
@@ -23,8 +25,8 @@ public class CompanyFacade extends ClientFacade {
 
 	private Company company;
 
-	private CompanyDBDAO companyDao;
-	private CouponDBDAO couponDao;
+	private UserDAO<Company> companyDao;
+	private ElementDAO<Coupon> couponDao;
 
 	public CompanyFacade(int id, CompanyDBDAO companyDao, CouponDBDAO couponDao) {
 		super();
@@ -42,9 +44,9 @@ public class CompanyFacade extends ClientFacade {
 	 * Allows to add a coupon to the company's available coupons in the system.
 	 * 
 	 * @param coupon - a {@link com.sys.beans.Coupon Coupon} object.
-	 * @throws CouponException
+	 * @throws CouponSystemException 
 	 */
-	public void addCoupon(Coupon coupon) throws CouponException {
+	public void addCoupon(Coupon coupon) throws CouponSystemException {
 
 		Collection<Coupon> allCoupons = couponDao.readAll(company);
 
@@ -62,9 +64,9 @@ public class CompanyFacade extends ClientFacade {
 	 * coupon.
 	 * 
 	 * @param coupon - a {@link com.sys.beans.Coupon Coupon} object.
-	 * @throws CouponException
+	 * @throws CouponSystemException 
 	 */
-	public void updateCoupon(Coupon coupon) throws CouponException {
+	public void updateCoupon(Coupon coupon) throws CouponSystemException {
 		Coupon existingCoupon = couponDao.read(coupon.getId());
 
 		if (existingCoupon.getCompanyId() != coupon.getCompanyId() || existingCoupon.getId() != coupon.getId()) {
@@ -78,9 +80,9 @@ public class CompanyFacade extends ClientFacade {
 	 * Also deletes coupon purchase history.
 	 * 
 	 * @param coupon - a {@link com.sys.beans.Coupon Coupon} object.
-	 * @throws CouponException
+	 * @throws CouponSystemException 
 	 */
-	public void removeCoupon(Coupon coupon) throws CouponException {
+	public void removeCoupon(Coupon coupon) throws CouponSystemException {
 		couponDao.deleteCouponFromHistory(coupon.getId());
 		couponDao.delete(coupon.getId());
 	}
@@ -90,9 +92,9 @@ public class CompanyFacade extends ClientFacade {
 	 * 
 	 * @param couponId - coupon id.
 	 * @return a {@link com.sys.beans.Coupon Coupon} object.
-	 * @throws CouponException
+	 * @throws CouponSystemException 
 	 */
-	public Coupon read(int couponId) throws CouponException {
+	public Coupon read(int couponId) throws CouponSystemException {
 		return couponDao.read(couponId);
 	}
 

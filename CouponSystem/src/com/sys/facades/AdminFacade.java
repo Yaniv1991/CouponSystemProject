@@ -8,8 +8,11 @@ import com.sys.beans.Customer;
 import com.sys.dao.CompanyDBDAO;
 import com.sys.dao.CouponDBDAO;
 import com.sys.dao.CustomerDBDAO;
+import com.sys.dao.ElementDAO;
+import com.sys.dao.UserDAO;
 import com.sys.exception.CompanyException;
 import com.sys.exception.CouponException;
+import com.sys.exception.CouponSystemException;
 import com.sys.exception.CustomerException;
 /**
  * 
@@ -18,9 +21,9 @@ import com.sys.exception.CustomerException;
  *
  */
 public class AdminFacade extends ClientFacade {
-private CustomerDBDAO customerDao;
-private CompanyDBDAO companyDao;
-private CouponDBDAO couponDao;
+private UserDAO<Customer> customerDao;
+private UserDAO<Company> companyDao;
+private ElementDAO<Coupon> couponDao;
 
 	
 	public AdminFacade(CustomerDBDAO customerDao, CompanyDBDAO companyDao, CouponDBDAO couponDao) {
@@ -40,9 +43,9 @@ private CouponDBDAO couponDao;
 	/**
 	 * Add a single company to the system.
 	 * @param company - a {@link com.sys.beans.Company Company} object.
-	 * @throws CompanyException
+	 * @throws CouponSystemException 
 	 */
-	public void addCompany(Company company) throws CompanyException {
+	public void addCompany(Company company) throws CouponSystemException {
 		if (companyDao.read(companyDao.getIdByEmail(company.getEmail())) != null) {
 			throw new CompanyException("Company with same email already exists");
 		}
@@ -60,9 +63,9 @@ private CouponDBDAO couponDao;
 	 * Update a company's details in the system.<br>
 	 * Restrictions: Cannot update company's name or ID.
 	 * @param company - a {@link com.sys.beans.Company Company} object.
-	 * @throws CompanyException
+	 * @throws CouponSystemException 
 	 */
-	public void updateCompany(Company company) throws CompanyException {
+	public void updateCompany(Company company) throws CouponSystemException {
 		Company existingCompany = companyDao.read(company.getId());
 
 		if (existingCompany.getId() != company.getId()
@@ -76,10 +79,9 @@ private CouponDBDAO couponDao;
 	 * Deletes a single company from the system.
 	 * Also deletes all coupons under that company, and coupon purchase history for all coupons.
 	 * @param company - a {@link com.sys.beans.Company Company} object.
-	 * @throws CouponException
-	 * @throws CompanyException
+	 * @throws CouponSystemException 
 	 */
-	public void removeCompany(Company company) throws CouponException, CompanyException {
+	public void removeCompany(Company company) throws CouponSystemException {
 		company = companyDao.read(company.getId());
 		for (Coupon coupon : company.getCoupons()) {
 			couponDao.deleteCouponFromHistory(coupon.getId());
@@ -93,9 +95,9 @@ private CouponDBDAO couponDao;
 	/**
 	 * Returns all companies currently in the system.
 	 * @return a collection of {@link com.sys.beans.Company Company} objects.
-	 * @throws CompanyException
+	 * @throws CouponSystemException 
 	 */
-	public Collection<Company> getAllCompanies() throws CompanyException {
+	public Collection<Company> getAllCompanies() throws CouponSystemException {
 		return companyDao.readAll();
 	}
 
@@ -103,9 +105,9 @@ private CouponDBDAO couponDao;
 	 * Returns a single company's details, using the company ID.
 	 * @param companyId - Integer representing the company Id.
 	 * @return a {@link com.sys.beans.Company Company} object.
-	 * @throws CompanyException
+	 * @throws CouponSystemException 
 	 */
-	public Company getCompanyById(int companyId) throws CompanyException {
+	public Company getCompanyById(int companyId) throws CouponSystemException {
 		return companyDao.read(companyId);
 	}
 
@@ -113,9 +115,9 @@ private CouponDBDAO couponDao;
 	 * Adds a single customer to the system.<br>
 	 * Restrictions: Cannot add two customers with the same email address.
 	 * @param customer - {@link com.sys.beans.Customer Customer} object.
-	 * @throws CustomerException
+	 * @throws CouponSystemException 
 	 */
-	public void addCustomer(Customer customer) throws CustomerException {
+	public void addCustomer(Customer customer) throws CouponSystemException {
 		if (customerDao.read(customerDao.getIdByEmail(customer.getEmail())) != null) {
 			throw new CustomerException("Customer exists with the same email");
 		}
@@ -126,9 +128,9 @@ private CouponDBDAO couponDao;
 	 * Updates a single customer in the system.<br>
 	 * Restrictions: Cannot update customer's ID. 
 	 * @param customer - {@link com.sys.beans.Customer Customer} object.
-	 * @throws CustomerException
+	 * @throws CouponSystemException 
 	 */
-	public void updateCustomer(Customer customer) throws CustomerException {
+	public void updateCustomer(Customer customer) throws CouponSystemException {
 		Customer existingCustomer = customerDao.read(customer.getId());
 		if (customer.getId() != existingCustomer.getId()) {
 			throw new CustomerException("cannot update customer id");
@@ -140,9 +142,9 @@ private CouponDBDAO couponDao;
 	 * Deletes a single customer from the system.<br>
 	 * Also deleting the customer's history of coupons purchased.
 	 * @param customer - {@link com.sys.beans.Customer Customer} object.
-	 * @throws CustomerException
+	 * @throws CouponSystemException 
 	 */
-	public void removeCustomer(Customer customer) throws CustomerException {
+	public void removeCustomer(Customer customer) throws CouponSystemException {
 		try {
 			Collection<Coupon> couponsToDelete = couponDao.readAll(customer);		
 			for (Coupon coupon : couponsToDelete) {
@@ -158,9 +160,9 @@ private CouponDBDAO couponDao;
 	/**
 	 * Returns all customers in the system.
 	 * @return a collection of {@link com.sys.beans.Customer Customer} objects.
-	 * @throws CustomerException
+	 * @throws CouponSystemException 
 	 */
-	public Collection<Customer> getAllCustomers() throws CustomerException {
+	public Collection<Customer> getAllCustomers() throws CouponSystemException {
 		return customerDao.readAll();
 	}
 
@@ -168,9 +170,9 @@ private CouponDBDAO couponDao;
 	 * Returns a single customer from the system per ID given.
 	 * @param customerId - an Integer for the customer's ID.
 	 * @return {@link com.sys.beans.Customer Customer} object.
-	 * @throws CustomerException
+	 * @throws CouponSystemException 
 	 */
-	public Customer getCustomerById(int customerId) throws CustomerException {
+	public Customer getCustomerById(int customerId) throws CouponSystemException {
 		return customerDao.read(customerId);
 	}
 
