@@ -66,6 +66,12 @@ public interface ElementDAO<T> extends DAO<T> {
 	 */
 	 Collection<Coupon> readAll(Customer customer) throws CouponException;
 	 
-	 //TODO Javadoc
+	 /**
+	  * 
+	  * Returns all coupons which have their expiration date passed.
+	  * 
+	  * @return A collection of {@link com.sys.beans.Coupon Coupon} objects.
+	  * @throws CouponSystemException
+	  */
 	 Collection<Coupon> readAllExpiredCoupons() throws CouponSystemException; 
 }
